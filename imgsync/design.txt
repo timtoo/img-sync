@@ -1,0 +1,91 @@
+- The main purpose is to be able to keep local images and image metadata in
+  an album in sync with a remote album
+
+    - The initial targets are:
+        - digikam and/or local file system
+        - picasaweb (using gdata api)
+
+- command line utility
+    - possible gui or web front end in future
+
+- common abstract representation/interface for albums/photos/meta-data
+    - ability to detect changes between source and destionation:
+        - raw image data change
+        - tag change
+        - geolocation change
+
+- extra local meta-data at the album level to track:
+    - sync date
+    - sync log
+    - privacy mode
+    - number of photos local
+    - newest local timestamp
+    - sync target
+        - remote album ID
+        - remote album name (if applicable)
+        - remote album title (if available)
+        - if sync target is the image source (ie. downloaded first
+          rather than uploaded)
+        - target album date
+        - number of photos on remote
+        - newest remote timestamp
+
+    - image metadata
+        - remote image id
+        - hash code
+            - hash for image data
+            - hash for tags
+            - hash for description
+            - hash for comment(s)
+            - hash for geocoding
+        - original upload date
+
+- uploading an album full of images to picasaweb
+    - read local album meta data, if any
+        - check found remote album name/IDs on remote services
+        - other status details
+    - if not album doesn't exist on remote service
+        - generate folder name if needed
+        - create folder
+            - default to private if not overridden
+        - update folder meta data locally
+    - loop over images...
+
+- if images doesn't exist in remote folder, upload picture
+    - verify file is an image file
+    - resize if requested
+    - generate hashes
+    - generate single string with all hashes encoded
+    - upload image
+    - attach metadata:
+        - store comment
+        - attach tags
+            - region tags/faces possible?
+        - attach geocoding
+        - store encoded hashes somewhere
+            - picasa has a place for this (may need to use filename for
+              others)
+    - store/update local metadata for image
+
+- update picture
+    - if raw photo data hash changed or update is forced
+        - same as uploading a picture, except replace existing
+        - NOTE: this may assume only local changes are synced to
+          remote for raw image data for now (unless procedure for
+          meta data below applies)
+
+    - for each metadata hash (description, tag set, geolocation):
+        - generate remote hash
+        - generate local hash
+        - compare local, remote and cached for bidirectional sync
+            - if local, remote, and local metadata (cached) hash is the
+              same, do nothing
+            - if local and local metadata (cached) hash is the same,
+                but remote hash is different, update remote meta data
+            - if remote and local metadata (cached) hash is the same,
+                but local hash is different, update local meta data
+            - if both remote and local hashes have changed from
+                the local metadata cache, a conflict has occured...
+                log/alert error state and skip
+
+
