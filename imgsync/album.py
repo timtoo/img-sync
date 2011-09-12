@@ -14,16 +14,18 @@ class Album(object):
         self.url = None
         self.images = []
 
-    def getPhotos(self):
-        raise RuntimeError, "getPhotos not implemented"
+    def getImages(self):
+        """Populate self.images"""
+        raise RuntimeError, "getImages not implemented"
 
     def getAlbumInfo(self):
+        """Set the album attributes"""
         raise RuntimeError, "getAlbumInfo not implemented"
 
     def getAlbum(self):
-        """Load album info and list of photo objects"""
+        """Load album info and list of image objects"""
         self.getAlbumInfo()
-        self.getPhotos()
+        self.getImages()
 
     def dump(self, f):
         """Write out the album to storage
@@ -41,6 +43,7 @@ class Album(object):
         for i in range(len(self.images)):
             section = 'image-' + str(i+1)
             config.add_section(section)
+            self.images[i].dumpConfig(config, section)
 
         config.write(f)
 
