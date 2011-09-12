@@ -1,5 +1,8 @@
+"""Handle local albums/images"""
+
 import os, time, datetime
 from album import Album
+from image import Image
 
 class LocalAlbum(Album):
     """Represent an album on a local disk. Album ID is the full path."""
@@ -24,8 +27,11 @@ class LocalAlbum(Album):
         else:
             raise ValueError, "Album path does not exist: %s" % self.id
 
-    def getPhotos(self):
-        return []
+    def getImages(self):
+        files = os.listdir(self.id)
+        for fn in files:
+            i = Image(self.id + os.sep + fn, filename=fn)
+            self.images.append(i)
 
 if __name__ == '__main__':
     import config
