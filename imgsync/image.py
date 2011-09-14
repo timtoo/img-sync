@@ -2,6 +2,7 @@ import hashlib
 
 class Image(object):
     def __init__(self, id, filename=None, timestamp=None, title=None, description=None):
+        self.service = {}
         self.id = id
         self.filename = filename
         self.timestamp = timestamp
@@ -64,5 +65,7 @@ class Image(object):
     def dumpConfig(self, config, section):
         config.set(section, 'id', self.id)
         self.filename and config.set(section, 'filename', self.filename or '')
-        self.description and config.set(section, 'description', self.description or '')
+        self.description and config.set(section, 'description',
+                self.description or '')
+        self.timestamp and config.set(section, 'timestamp', self.timestamp)
 
