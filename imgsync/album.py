@@ -1,13 +1,62 @@
 import cStringIO
 import ConfigParser
+import json
 
 class Album(object):
     """Album base class"""
-    service = ''
 
+    def __init__(self):
+        self.service = {}
+
+    def getAlbum(self, service, default=None):
+        """Load album info and list of image objects"""
+        return self.service.get(service, default)
+
+    def dump(self, f):
+        """Write out the album to storage
+        """
+        config = ConfigParser.ConfigParser()
+        config.add_section('global')
+        config.set('global', 'service', ', '.join(sorted(self.service.keys())))
+
+        for s in sorted(self.service.keys()):
+            album = self.service[s]
+
+            config.add_section(s)
+
+            config.set(s, 'id', album.id)
+            config.set(s, 'title', album.title)
+            config.set(s, 'description', album.description)
+            config.set(s, 'date', album.date)
+            config.set(s, 'url', album.url)
+            config.set(s, 'count', len(album.images))
+
+            for i in range(len(album.images)):
+                section = s+'-image-' + str(i+1)
+                config.add_section(section)
+                album.images[i].dumpConfig(config, section)
+
+            config.write(f)
+
+
+    def load(self, f):
+        """
+        """
+
+    def dumps(self):
+        f = cStringIO.StringIO()
+        self.dump(f)
+        return f.getvalue()
+
+
+
+class AlbumAdaptor(object):
+    """Album adaptor base class"""
+    service = ''
 
     def __init__(self, id):
         self.id = id
+        self.service = {}
         self.title = None
         self.description = None
         self.date = None
