@@ -1,4 +1,4 @@
-import hashlib
+import hashlib, json
 
 class Image(object):
     def __init__(self, id, filename=None, timestamp=None, title=None, description=None):
@@ -68,4 +68,6 @@ class Image(object):
         self.description and config.set(section, 'description',
                 self.description or '')
         self.timestamp and config.set(section, 'timestamp', self.timestamp)
+        print self.tags
+        config.set(section, 'tags', json.dumps(self.tags))
 

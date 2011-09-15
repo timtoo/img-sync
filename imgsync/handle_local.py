@@ -1,21 +1,25 @@
 """Handle local albums/images"""
 
 import os, time, datetime, re
-from album import Album
+from album import Album, AlbumAdaptor
 from image import Image
 
 try:
     import pyexiv2
 except ImportError:
+    print "Warning: pyexiv2 not found: embedded local image metadata will be ignored"
     pyexiv2 = None
 
-class LocalAlbum(Album):
-    """Represent an album on a local disk. Album ID is the full path."""
+class LocalAlbum(AlbumAdaptor):
+    """Adapt Album with support for local directory functionality. Album ID is the full path."""
     service = 'local'
     img_regex = re.compile(r'\.(png|jpg|jpeg)$', re.I)
 
-    def __init__(self, id):
-        # remove trailing slash
+    def __init__(self, id, album=None):
+        self.album = album or Album()
+        self.album.service[self.service] = self
+
+        # remove trailing slash from directory name
         super(LocalAlbum, self).__init__(id.rstrip(os.sep))
 
     @staticmethod
@@ -32,9 +36,6 @@ class LocalAlbum(Album):
             self.description = ''
             # last element in path, with underscores converted to spaces
             self.title = os.path.split(path)[-1].strip(os.sep).replace('_', ' ')
-
-            print self.id
-            print self.title
 
         else:
             raise ValueError, "Album path does not exist: %s" % self.id
@@ -57,7 +58,7 @@ class LocalAlbum(Album):
                                 'Xmp.MicrosoftPhoto.LastKeywordXMP',
                                 'Xmp.lr.hierarchicalSubject'):
                         if k in meta.iptc_keys and meta[k].value:
-                            self.tags = meta[k].value
+                            i.tags = meta[k].value
                             break
 
                 self.images.append(i)
@@ -76,7 +77,7 @@ if __name__ == '__main__':
 
     a = LocalAlbum(c['source'][0])
     data = a.getAlbum()
-    print a.dumps()
+    print a.album.dumps()
 
 
 
