@@ -23,6 +23,13 @@ class LocalImage(Image):
         st = os.stat(self.id)
         self.timestamp = self.stat2datetime(st)
         self.title = self.filename
+        self.size = os.stat(self.id)[6]
+
+        meta = self.getExiv2()
+        if 'Exif.Photo.DateTimeOriginal' in meta.exif_keys:
+            self.original = meta['Exif.Photo.DateTimeOriginal'].value
+        else:
+            self.original = self.timestamp
 
     def setTags(self):
         self.tags = []
@@ -69,7 +76,7 @@ class LocalAlbum(AlbumAdaptor):
         self.album.service[self.service] = self
 
         # remove trailing slash from directory name
-        super(LocalAlbum, self).__init__(id.rstrip(os.sep))
+        super(LocalAlbum, self).__init__(os.path.abspath(id.rstrip(os.sep)))
 
     def getAlbumInfo(self):
         path = self.id

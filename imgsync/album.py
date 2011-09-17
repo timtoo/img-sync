@@ -2,6 +2,8 @@ import cStringIO
 import ConfigParser
 import json
 
+CONFIG_VERSION = "1.0"
+
 class Album(object):
     """Album base class"""
 
@@ -18,6 +20,7 @@ class Album(object):
         config = ConfigParser.ConfigParser()
         config.add_section('global')
         config.set('global', 'service', ', '.join(sorted(self.service.keys())))
+        config.set('global', 'config', CONFIG_VERSION)
 
         for s in sorted(self.service.keys()):
             album = self.service[s]
