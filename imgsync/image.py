@@ -109,5 +109,6 @@ class Image(object):
         self.timestamp and config.set(section, 'timestamp', self.timestamp)
         self.original and config.set(section, 'original', self.original)
         self.size and config.set(section, 'size', self.size)
+        self.geocode and config.set(section, 'geocode', self.geocode)
         config.set(section, 'tags', json.dumps(self.tags))
 

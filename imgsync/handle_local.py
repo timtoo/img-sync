@@ -16,6 +16,20 @@ class LocalImage(Image):
         """Given an os.stat structure, return datetime object"""
         return datetime.datetime(*(time.localtime(st[8]))[0:6])
 
+    def firstExiv2Val(self, keys, default=None, raw=False):
+        meta = self.getExiv2()
+        if meta:
+            for k in keys:
+                if k in meta.iptc_keys and meta[k].value or \
+                        k in meta.exif_keys or \
+                        k in meta.xmp_keys:
+                    if raw:
+                        print k, meta[k]
+                        return meta[k].raw_value
+                    else:
+                        return meta[k].value
+        return default
+
     def openFile(self):
         return open(self.id, 'rb')
 
@@ -32,17 +46,13 @@ class LocalImage(Image):
             self.original = self.timestamp
 
     def setTags(self):
-        self.tags = []
-        meta = self.getExiv2()
-        if meta:
-            for k in ('Iptc.Application2.Keywords',
+        self.tags = self.firstExiv2Val((
+                        'Iptc.Application2.Keywords',
                         'Xmp.dc.subject',
                         'Xmp.digiKam.TagsList',
                         'Xmp.MicrosoftPhoto.LastKeywordXMP',
-                        'Xmp.lr.hierarchicalSubject'):
-                if k in meta.iptc_keys and meta[k].value:
-                    self.tags = meta[k].value
-                    break
+                        'Xmp.lr.hierarchicalSubject',
+                         ), default=[])
 
     def setDescription(self):
         meta = self.getExiv2()
@@ -52,7 +62,24 @@ class LocalImage(Image):
             self.description =  ''
 
     def setGeolocation(self):
-        pass
+        latitude = self.firstExiv2Val((
+                        'Exif.GPSInfo.GPSLatitude',
+                        'Xmp.exif.GPSLatitude'
+                         ), raw=True)
+        latitudeRef = self.firstExiv2Val((
+                        'Exif.GPSInfo.GPSLatitudeRef',
+                        'Xmp.exif.GPSLatitudeRef'
+                         ), raw=True)
+        longitude = self.firstExiv2Val((
+                        'Exif.GPSInfo.GPSLongitude',
+                        'Xmp.exif.GPSLongitude'
+                         ), raw=True)
+        longitudeRef = self.firstExiv2Val((
+                        'Exif.GPSInfo.GPSLongitudeRef',
+                        'Xmp.exif.GPSLongitudeRef'
+                         ), raw=True)
+        if latitude:
+            self.geocode = str((latitude, latitudeRef, longitude, longitudeRef))
 
     def setComments(self):
         pass
