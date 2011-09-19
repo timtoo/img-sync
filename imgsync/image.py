@@ -97,6 +97,37 @@ class Image(object):
         self.setComments()
         return self
 
+    def __iter__(self):
+        config.set(section, 'id', self.id)
+        config.set(section, 'hash', self.fileHash)
+        config.set(section, 'meta', self.metaHash)
+        self.filename and config.set(section, 'filename', self.filename or '')
+        self.title and config.set(section, 'title', self.title or '')
+        self.description and config.set(section, 'description',
+                self.description or '')
+        self.timestamp and config.set(section, 'timestamp', self.timestamp)
+        self.original and config.set(section, 'original', self.original)
+        self.size and config.set(section, 'size', self.size)
+        self.geocode and config.set(section, 'geocode', json.dumps(self.geocode))
+        config.set(section, 'tags', json.dumps(self.tags))
+
+    def dumpDict(self):
+        """Dump object data to a config file"""
+        data = {
+                'id': self.id,
+                'hash': self.fileHash,
+                'meta': self.metaHash,
+                }
+        if self.filename: data['filename'] = self.filename
+        if self.title: data['title'] = self.title
+        if self.description: data['description'] = self.description
+        if self.timestamp: data['timestamp'] = self.timestamp
+        if self.original: data['original'] = self.original
+        if self.size: data['size'] = self.size
+        if self.geocode: data['geocode'] = self.geocode
+        if self.tags: data['tags'] = self.tags
+        return data
+
     def dumpConfig(self, config, section):
         """Dump object data to a config file"""
         config.set(section, 'id', self.id)
