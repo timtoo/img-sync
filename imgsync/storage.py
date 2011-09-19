@@ -2,8 +2,6 @@ import datetime
 import cStringIO
 import ConfigParser
 
-CONFIG_VERSION = "1.0"
-
 class Storage(object):
     """Encapsulate dumping/loading of persistent (cached) album data"""
     def __init__(self, album):
@@ -31,6 +29,7 @@ class Storage(object):
 
 class LocalFileStorage(Storage):
     """Use ConfigParser to create config file to store in local directory"""
+    CONFIG_VERSION = "1.0"
 
     def dump(self, f):
         """Write out the album to storage
@@ -38,7 +37,7 @@ class LocalFileStorage(Storage):
         config = ConfigParser.ConfigParser()
         config.add_section('global')
         config.set('global', 'service', ', '.join(sorted(self.album.service.keys())))
-        config.set('global', 'config', CONFIG_VERSION)
+        config.set('global', 'config', self.CONFIG_VERSION)
 
         for s in sorted(self.album.service.keys()):
             album = self.album.service[s]
@@ -51,7 +50,7 @@ class LocalFileStorage(Storage):
             config.set(s, 'date', album.date)
             config.set(s, 'url', album.url)
             config.set(s, 'count', len(album.images))
-            config.set(s, 'config', CONFIG_VERSION)
+            config.set(s, 'config', self.CONFIG_VERSION)
             config.set(s, 'timestamp', datetime.datetime.now())
 
             for i in range(len(album.images)):

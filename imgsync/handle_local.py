@@ -94,7 +94,8 @@ class LocalImage(Image):
 
 class LocalAlbum(AlbumAdaptor):
     """Adapt Album with support for local directory functionality. Album ID is the full path."""
-    type = 'local'
+    service_name = 'local'
+
     img_regex = re.compile(r'\.(png|jpg|jpeg)$', re.I)
 
     def __init__(self, id, album=None):
@@ -137,7 +138,9 @@ if __name__ == '__main__':
 
     a = LocalAlbum(c['local'][0])
     data = a.getAlbum()
-    print a.album.dumps()
+    #print a.album.dumps()
+    print dict(a.album)
+
 
 
 

@@ -1,3 +1,5 @@
+import datetime
+
 from storage import LocalFileStorage
 
 class Album(object):
@@ -11,6 +13,41 @@ class Album(object):
         """Load album info and list of image objects"""
         return self.service.get(service, default)
 
+    def dumpDict(self):
+        """Gather all data into a dictionary with the following structure:
+
+            {
+                global: info
+                service: { service: info,
+                           images: [
+                                { image: data }
+                            ]
+                         }
+            }
+
+        Note: values in the dictionary should be of the expected types.
+        (DateTime objects, where appropriate, etc)
+        """
+        data = { 'service': { } }
+        for s in sorted(self.service.keys()):
+            album = {
+                    'id': self.service[s].id,
+                    'title': self.service[s].title,
+                    'description': self.service[s].description,
+                    'date': self.service[s].date,
+                    'url': self.service[s].url,
+                    'timestamp': datetime.datetime.now(),
+                    'images': []
+                }
+
+
+            print self.service[s].images
+            for i in self.service[s].images:
+                album['images'].append(i.dumpData())
+
+            data['service'][s] = album
+        return data
+
     def dump(self, f):
         """Gather all data into a simple dictionary stucture to provide
             to a storage backend"""
@@ -22,8 +59,10 @@ class Album(object):
 
 
 class AlbumAdaptor(object):
-    """Album adaptor base class"""
-    type = ''
+    """Album adaptor base class. Create an subclass of this, as well as the Image class
+    to support a new service type.
+    """
+    service_name = ''
 
     def __init__(self, id, album=None):
         self.album = album or Album()
@@ -34,8 +73,7 @@ class AlbumAdaptor(object):
         self.date = None
         self.url = None
         self.images = []
-        print "hello", self.service,
-        self.album.service[self.type] = self
+        self.album.service[self.service_name] = self
 
     def getImages(self):
         """Populate self.images"""
