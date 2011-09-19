@@ -79,7 +79,7 @@ class LocalImage(Image):
                         'Xmp.exif.GPSLongitudeRef'
                          ), raw=True)
         if latitude:
-            self.geocode = str((latitude, latitudeRef, longitude, longitudeRef))
+            self.geocode = (latitude, latitudeRef, longitude, longitudeRef)
 
     def setComments(self):
         pass

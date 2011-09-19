@@ -51,7 +51,7 @@ class Image(object):
             self.description and data.append(self.description)
             self.comments and data.append(','.join(self.comments))
             self.tags and data.append(','.join(self.tags))
-            self.geocode and data.append(self.geocode)
+            self.geocode and data.append(json.dumps(self.geocode))
             self.original and data.append(str(self.original))
 
             _hash = hashlib.sha256()
@@ -109,6 +109,6 @@ class Image(object):
         self.timestamp and config.set(section, 'timestamp', self.timestamp)
         self.original and config.set(section, 'original', self.original)
         self.size and config.set(section, 'size', self.size)
-        self.geocode and config.set(section, 'geocode', self.geocode)
+        self.geocode and config.set(section, 'geocode', json.dumps(self.geocode))
         config.set(section, 'tags', json.dumps(self.tags))
 

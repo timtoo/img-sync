@@ -1,5 +1,5 @@
 import os
-import optparse
+import argparse
 import ConfigParser
 
 SERVICE = ( 'digikam', 'picasa', )
@@ -13,16 +13,19 @@ class Config(object):
     def __init__(self):
         self._config_filename = '.pycasa-sync.rc'
         self._config_path = None
+        self.parser = None
+        self.opts = None
+        self.args = None
         self.data = {
-            'source': None,
+            'local': None,
             'service': {},
             }
 
         for s in SERVICE:
             self.data['service'][s] = {}
 
-        self.config_from_file()
         self.config_from_cli()
+        self.config_from_file()
 
     def get(self, key, default=None):
         return self.data.get(key)
@@ -35,22 +38,28 @@ class Config(object):
 
     def config_from_cli(self):
         """Get options from command line"""
-        parser = optparse.OptionParser()
-        parser.add_option('--picasa-user')
-        parser.add_option('--picasa-password', '--password')
+        parser = argparse.ArgumentParser()
+        parser.add_argument('local', nargs='*')
+        parser.add_argument('--config')
+        parser.add_argument('--picasa-user')
+        parser.add_argument('--picasa-password', '--password')
+        parser.add_argument('-t', '--sync-to', choices=SERVICE)
+        parser.add_argument('-f', '--sync-from', choices=SERVICE)
 
-        opts, args = parser.parse_args()
+        opts = parser.parse_args()
         for k in self.data.keys():
             if getattr(opts,k,None):
                 self.data[k] = getattr(opts,k,None)
-        if args:
-            self.data['source'] = args
 
         if opts.picasa_user:
             self.data['service']['picasa']['user'] = opts.picasa_user
         if opts.picasa_password:
             self.data['service']['picasa']['password'] = opts.picasa_password
 
+        if opts.config:
+            self._config_path = opts.config
+
+        self.opts = opts
         return self
 
     @property
@@ -89,7 +98,11 @@ class Config(object):
             for s in SERVICE:
                 if parser.has_section(s):
                     for k,v in parser.items(s):
-                        self.data['service'][s][k] = v
+                        # do not overwrite settings already set via command line
+                        if not self.data['service'][s].has_key(k):
+                            self.data['service'][s][k] = v
+
+            self.parser = parser
 
 
 if __name__ == '__main__':

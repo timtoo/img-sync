@@ -1,5 +1,6 @@
 import cStringIO
 import ConfigParser
+import datetime
 import json
 
 CONFIG_VERSION = "1.0"
@@ -33,6 +34,8 @@ class Album(object):
             config.set(s, 'date', album.date)
             config.set(s, 'url', album.url)
             config.set(s, 'count', len(album.images))
+            config.set(s, 'config', CONFIG_VERSION)
+            config.set(s, 'timestamp', datetime.datetime.now())
 
             for i in range(len(album.images)):
                 section = s+'-image-' + str(i+1)
