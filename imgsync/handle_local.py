@@ -24,7 +24,6 @@ class LocalImage(Image):
                         k in meta.exif_keys or \
                         k in meta.xmp_keys:
                     if raw:
-                        print k, meta[k]
                         return meta[k].raw_value
                     else:
                         return meta[k].value
@@ -95,13 +94,10 @@ class LocalImage(Image):
 
 class LocalAlbum(AlbumAdaptor):
     """Adapt Album with support for local directory functionality. Album ID is the full path."""
-    service = 'local'
+    type = 'local'
     img_regex = re.compile(r'\.(png|jpg|jpeg)$', re.I)
 
     def __init__(self, id, album=None):
-        self.album = album or Album()
-        self.album.service[self.service] = self
-
         # remove trailing slash from directory name
         super(LocalAlbum, self).__init__(os.path.abspath(id.rstrip(os.sep)))
 
@@ -139,7 +135,7 @@ if __name__ == '__main__':
     import config
     c = config.Config()
 
-    a = LocalAlbum(c['source'][0])
+    a = LocalAlbum(c['local'][0])
     data = a.getAlbum()
     print a.album.dumps()
 
