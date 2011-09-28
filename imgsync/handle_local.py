@@ -139,7 +139,7 @@ if __name__ == '__main__':
     a = LocalAlbum(c['local'][0])
     data = a.getAlbum()
     #print a.album.dumps()
-    print dict(a.album)
+    print a.album.dumpDict()
 
 
 

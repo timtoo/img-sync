@@ -43,7 +43,7 @@ class Album(object):
 
             print self.service[s].images
             for i in self.service[s].images:
-                album['images'].append(i.dumpData())
+                album['images'].append(i.dumpDict())
 
             data['service'][s] = album
         return data
@@ -67,7 +67,6 @@ class AlbumAdaptor(object):
     def __init__(self, id, album=None):
         self.album = album or Album()
         self.id = id
-        self.service = {}
         self.title = None
         self.description = None
         self.date = None
