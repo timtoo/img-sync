@@ -58,7 +58,7 @@ class LocalFileStorage(Storage):
                 config.add_section(section)
                 album.images[i].dumpConfig(config, section)
 
-            config.write(f)
+        config.write(f)
 
 
     def load(self, f):
