@@ -1,7 +1,7 @@
 """Code for handling local albums/images"""
 
 import os, time, datetime, re
-from album import Album, AlbumAdaptor
+from album import Album
 from image import Image
 
 try:
@@ -94,7 +94,7 @@ class LocalImage(Image):
         return self._exiv2
 
 
-class LocalAlbum(AlbumAdaptor):
+class LocalAlbum(Album):
     """Adapt Album with support for local directory functionality. Album ID is the full path."""
     service_name = 'local'
 
@@ -142,8 +142,8 @@ if __name__ == '__main__':
 
     a = LocalAlbum(c['local'][0])
     data = a.getAlbum()
-    #print a.album.dumps()
-    print a.album.dumpDict()
+    #print a.registry.dumps()
+    print a.registry.dumpDict()
 
 
 
