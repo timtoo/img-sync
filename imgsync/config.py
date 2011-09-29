@@ -11,7 +11,7 @@ class Config(object):
     """
 
     def __init__(self):
-        self._config_filename = '.pycasa-sync.rc'
+        self._config_filename = '.img-sync.rc'
         self._config_path = None
         self.parser = None
         self.opts = None
@@ -41,6 +41,7 @@ class Config(object):
         parser = argparse.ArgumentParser()
         parser.add_argument('local', nargs='*')
         parser.add_argument('--config')
+        parser.add_argument('--picasa-albums', help="List Picasa albums and ID codes")
         parser.add_argument('--picasa-user')
         parser.add_argument('--picasa-password')
         parser.add_argument('--picasa-title', help="Name of album on Picassa (if lookup needed)")
@@ -108,12 +109,16 @@ class Config(object):
 
             self.parser = parser
 
+    def pprint(self):
+        """Pretty Print the contents of the config object, for debugging"""
+        import pprint
+        print 'Config file: %r' % c._config_path
+        pprint.pprint(self.data)
+
 
 if __name__ == '__main__':
-    import pprint
     c = Config()
-    pprint.pprint(c._config_path)
-    pprint.pprint(c.data)
+    c.pprint()
 
 
 
