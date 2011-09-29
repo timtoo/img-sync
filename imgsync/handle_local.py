@@ -39,10 +39,11 @@ class LocalImage(Image):
         self.size = os.stat(self.id)[6]
 
         meta = self.getExiv2()
-        if 'Exif.Photo.DateTimeOriginal' in meta.exif_keys:
-            self.original = meta['Exif.Photo.DateTimeOriginal'].value
-        else:
-            self.original = self.timestamp
+        if meta:
+            if 'Exif.Photo.DateTimeOriginal' in meta.exif_keys:
+                self.original = meta['Exif.Photo.DateTimeOriginal'].value
+            else:
+                self.original = self.timestamp
 
     def setTags(self):
         self.tags = self.firstExiv2Val((
@@ -86,6 +87,7 @@ class LocalImage(Image):
     def getExiv2(self):
         """Return exiv2 metadata object"""
         if not hasattr(self, '_exiv2'):
+            self._exiv2 = None
             if pyexiv2:
                 self._exiv2 = pyexiv2.ImageMetadata(self.id)
                 self._exiv2.read()
@@ -98,9 +100,10 @@ class LocalAlbum(AlbumAdaptor):
 
     img_regex = re.compile(r'\.(png|jpg|jpeg)$', re.I)
 
-    def __init__(self, id, album=None):
-        # remove trailing slash from directory name
-        super(LocalAlbum, self).__init__(os.path.abspath(id.rstrip(os.sep)))
+    def postinit(self):
+        if self.id:
+            # clean/normalize path
+            self.id = os.path.abspath(self.id.strip().rstrip(os.sep))
 
     def getAlbumInfo(self):
         path = self.id
@@ -135,6 +138,7 @@ class LocalAlbum(AlbumAdaptor):
 if __name__ == '__main__':
     import config
     c = config.Config()
+    c.pprint()
 
     a = LocalAlbum(c['local'][0])
     data = a.getAlbum()
