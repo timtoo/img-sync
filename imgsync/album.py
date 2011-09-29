@@ -3,10 +3,15 @@ import datetime
 from storage import LocalFileStorage
 from config import Config
 
-class Album(object):
-    """Album base class; this is intended as a singleton which
-    AlbumAdaptor instances all share (it acts as a registry for
-    AlbumAdapter service instances)
+class AlbumRegistry(object):
+    """A singleton intended for all Album instances to share
+
+    It collects all of the album instances and provides methods that act on all
+    existing Album instances.
+
+    This class is created automatically if it doesn't already exist when instantiating an Album.
+
+    This class contains a Config() object to be shared by all processes.
     """
 
     def __init__(self, storage=LocalFileStorage):
@@ -63,21 +68,21 @@ class Album(object):
 
 
 
-class AlbumAdaptor(object):
+class Album(object):
     """Album adaptor base class. Create an subclass of this, as well as the Image class
     to support a new service type.
     """
     service_name = ''
 
-    def __init__(self, id, album=None):
-        self.album = album or Album()
+    def __init__(self, id, registry=None):
+        self.registry = registry or AlbumRegistry()
         self.id = id
         self.title = None
         self.description = None
         self.date = None
         self.url = None
         self.images = []
-        self.album.service[self.service_name] = self
+        self.registry.service[self.service_name] = self
         self.postinit()
 
     def postinit(self):
@@ -96,11 +101,6 @@ class AlbumAdaptor(object):
         """Load album info and list of image objects"""
         self.getAlbumInfo()
         self.getImages()
-
-
-
-
-
-
+        return self
 
 
