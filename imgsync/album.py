@@ -1,13 +1,18 @@
 import datetime
 
 from storage import LocalFileStorage
+from config import Config
 
 class Album(object):
-    """Album base class"""
+    """Album base class; this is intended as a singleton which
+    AlbumAdaptor instances all share (it acts as a registry for
+    AlbumAdapter service instances)
+    """
 
     def __init__(self, storage=LocalFileStorage):
         self.service = {}
         self._storage = storage
+        self.config = Config()
 
     def getAlbum(self, service, default=None):
         """Load album info and list of image objects"""
@@ -73,6 +78,11 @@ class AlbumAdaptor(object):
         self.url = None
         self.images = []
         self.album.service[self.service_name] = self
+        self.postinit()
+
+    def postinit(self):
+        """Stuff to do by subclasses after __init__ takes place"""
+        pass
 
     def getImages(self):
         """Populate self.images"""

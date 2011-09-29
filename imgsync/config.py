@@ -112,7 +112,7 @@ class Config(object):
     def pprint(self):
         """Pretty Print the contents of the config object, for debugging"""
         import pprint
-        print 'Config file: %r' % c._config_path
+        print '# Config file: %r' % self._config_path
         pprint.pprint(self.data)
 
 
