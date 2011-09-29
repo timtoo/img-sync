@@ -50,8 +50,6 @@ class AlbumRegistry(object):
                     'images': []
                 }
 
-
-            print self.service[s].images
             for i in self.service[s].images:
                 album['images'].append(i.dumpDict())
 
