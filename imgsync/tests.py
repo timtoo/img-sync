@@ -47,5 +47,11 @@ def test_local():
     # try to execute getAlbum and see if it returns itself
     assert(isinstance(album.getAlbum(), handle_local.LocalAlbum))
 
+    data = album.registry.dumpDict()
+    assert(data.has_key('service'))
+    assert(data['service'].has_key('local'))
+    assert(data['service']['local']['url'].startswith('file://'))
+    assert(len(data['service']['local']['images']) == 4)
+
 
 
