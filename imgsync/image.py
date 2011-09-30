@@ -1,4 +1,5 @@
 import hashlib, json
+from cStringIO import StringIO
 
 class Image(object):
     """Base object for represeting single images.
@@ -7,7 +8,8 @@ class Image(object):
     If a particular set* method is not needed, it still must be overridden
     to avoid an exception (to ensure it explicitely is not needed).
     """
-    def __init__(self, id, filename=None, timestamp=None, title=None, description=None):
+    def __init__(self, id, filename=None, timestamp=None, title=None,
+            description=None):
         self.service = {}
         self.id = id
         self.filename = filename
@@ -22,17 +24,36 @@ class Image(object):
         self._hashMeta = None
         self._hashFile = None
 
-    @property
-    def fileHash(self):
-        if self._hashFile is None:
-            _hash = hashlib.sha256()
-            f = self.openFile()
+    @staticmethod
+    def calcHash(source):
+        """Given a file handle or string, return a hash string; this method
+        is to standardize the hashing method for all handlers
+        """
+        if source:
+            if not hasattr(source, 'read'):
+                source = StringIO(source)
+
+            hash = hashlib.sha256()
             while True:
-                data = f.read(1024000)
+                data = source.read(1024000)
                 if not data:
                     break
-                _hash.update(data)
-            self._hashFile = _hash.hexdigest()
+                hash.update(data)
+            return hash.hexdigest()
+
+    def calcImageHash(self):
+        """Method called to calculate hash value for image file.
+        The job of this method is to create a file handle to
+        the image data, and return the result of passing that
+        filehandle to self.calcHash()
+        """
+        raise RuntimeError, "calcImageHash not implemented"
+
+    @property
+    def imageHash(self):
+        """Wrapper around calcImageHash() to use as a property"""
+        if self._hashFile is None:
+            self._hashFile = self.calcImageHash()
         return self._hashFile
 
     @property
@@ -54,9 +75,7 @@ class Image(object):
             self.geocode and data.append(json.dumps(self.geocode))
             self.original and data.append(str(self.original))
 
-            _hash = hashlib.sha256()
-            _hash.update('\n'.join(data))
-            self._hashMeta = _hash.hexdigest()
+            self._hashMeta = self.calcHash('\n'.join(data))
         return self._hashMeta
 
     def openFile(self):
@@ -99,7 +118,7 @@ class Image(object):
 
     def __iter__(self):
         config.set(section, 'id', self.id)
-        config.set(section, 'hash', self.fileHash)
+        config.set(section, 'hash', self.imageHash)
         config.set(section, 'meta', self.metaHash)
         self.filename and config.set(section, 'filename', self.filename or '')
         self.title and config.set(section, 'title', self.title or '')
@@ -115,7 +134,7 @@ class Image(object):
         """Dump object data to a config file"""
         data = {
                 'id': self.id,
-                'hash': self.fileHash,
+                'hash': self.imageHash,
                 'meta': self.metaHash,
                 }
         if self.filename: data['filename'] = self.filename
@@ -131,7 +150,7 @@ class Image(object):
     def dumpConfig(self, config, section):
         """Dump object data to a config file"""
         config.set(section, 'id', self.id)
-        config.set(section, 'hash', self.fileHash)
+        config.set(section, 'hash', self.imageHash)
         config.set(section, 'meta', self.metaHash)
         self.filename and config.set(section, 'filename', self.filename or '')
         self.title and config.set(section, 'title', self.title or '')
