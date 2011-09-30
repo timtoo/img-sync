@@ -93,6 +93,10 @@ class LocalImage(Image):
                 self._exiv2.read()
         return self._exiv2
 
+    def calcImageHash(self):
+        f = self.openFile()
+        return self.calcHash(f)
+
 
 class LocalAlbum(Album):
     """Adapt Album with support for local directory functionality. Album ID is the full path."""

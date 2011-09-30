@@ -41,7 +41,7 @@ class Config(object):
         parser = argparse.ArgumentParser()
         parser.add_argument('local', nargs='*')
         parser.add_argument('--config')
-        parser.add_argument('--picasa-albums', help="List Picasa albums and ID codes")
+        parser.add_argument('--picasa-list', action='store_true', help="List Picasa albums and ID codes")
         parser.add_argument('--picasa-user')
         parser.add_argument('--picasa-password')
         parser.add_argument('--picasa-title', help="Name of album on Picassa (if lookup needed)")

@@ -1,11 +1,13 @@
 # test module is intended to be run via nosetests
 
 import os, sys
+from cStringIO import StringIO
 
 # remove nose command line arguments before running tests (before Config sees them)
 sys.argv = sys.argv[:1]
 
 from album import AlbumRegistry
+from image import Image
 
 
 def test_registry():
@@ -52,6 +54,14 @@ def test_local():
     assert(data['service'].has_key('local'))
     assert(data['service']['local']['url'].startswith('file://'))
     assert(len(data['service']['local']['images']) == 4)
+
+
+
+def test_image():
+    i = Image('?')
+
+    assert(i.calcHash('test') == '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08')
+
 
 
 

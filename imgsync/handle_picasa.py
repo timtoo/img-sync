@@ -12,6 +12,9 @@ from image import Image
 
 class PicasaImage(Image):
 
+    def openFile(self):
+        return open('/etc/motd', 'r')
+
     def setDetails(self):
         pass
 
@@ -27,10 +30,15 @@ class PicasaImage(Image):
     def setComments(self):
         pass
 
+    def calcImageHash(self):
+        return ''
+
 
 
 class PicasaAlbum(Album):
-    """Adapt Album with support for picasa folder functionality. Album ID is the full path."""
+    """Adapt Album with support for picasa folder functionality. Album ID is
+    the full path.
+    """
     service_name = 'local'
 
     img_regex = re.compile(r'\.(png|jpg|jpeg)$', re.I)
@@ -42,7 +50,20 @@ class PicasaAlbum(Album):
         pass
 
     def getImages(self):
-        pass
+        #  'albumid', 'author', 'category', 'checksum', 'client', 'commentCount', 'commentingEnabled', 'content', 'contributor', 'control', 'exif', 'extension_attributes', 'extension_elements', 'geo', 'gphoto_id', 'height', 'id', 'kind', 'link', 'media', 'position', 'published', 'rights', 'rotation', 'size', 'snippet', 'snippettype', 'source', 'summary', 'tags', 'text', 'timestamp', 'title', 'truncated', 'updated', 'version', 'width'
+        uri = '/data/feed/api/user/default/albumid/%s?kind=photo'
+        result = self.client.GetFeed(uri % self.id)
+        self.images = []
+        for p in result.entry:
+            i = PicasaImage(p.id.text, filename=p.content.src,
+                    timestamp=p.timestamp.datetime(),
+                    title = p.title and p.title.text or None,
+                    description = p.summary and p.summary.text or None)
+
+            print self.registry.dumpDict(), 'x'
+            self.images.append(i)
+
+
 
     @property
     def client(self):
@@ -63,7 +84,8 @@ class PicasaAlbum(Album):
     def printAlbumList(self):
         """Helper function to print list of recent albums to stdout to see the IDs"""
         for a in self.getAlbumList():
-            print a.gphoto_id.text, a.timestamp.isoformat(), a.access.text[:4], a.name.text
+            print '%s %s [%s] %4s: %s' % (a.gphoto_id.text, a.timestamp.isoformat(),
+                    a.access.text[:4], a.numphotos.text, a.title.text)
 
 
 
@@ -78,8 +100,10 @@ if __name__ == '__main__':
         return client.GetFeed(uri, limit=limit)
 
     #albums = client.GetUserFeed()
-    album = PicasaAlbum('')
-    album.printAlbumList()
+    album = PicasaAlbum('5649260481048764721')
+    #album.printAlbumList()
+    print album.getImages()
+
 
 
 

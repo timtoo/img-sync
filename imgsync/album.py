@@ -6,10 +6,11 @@ from config import Config
 class AlbumRegistry(object):
     """A singleton intended for all Album instances to share
 
-    It collects all of the album instances and provides methods that act on all
-    existing Album instances.
+    It collects all of the album instances and provides methods that act on
+    all existing Album instances.
 
-    This class is created automatically if it doesn't already exist when instantiating an Album.
+    This class is created automatically if it doesn't already exist when
+    instantiating an Album.
 
     This class contains a Config() object to be shared by all processes.
     """
