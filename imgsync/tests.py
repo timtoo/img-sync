@@ -48,12 +48,23 @@ def test_local():
 
     # try to execute getAlbum and see if it returns itself
     assert(isinstance(album.getAlbum(), handle_local.LocalAlbum))
+    assert(len(album.images) == 4)
 
     data = album.registry.dumpDict()
     assert(data.has_key('service'))
     assert(data['service'].has_key('local'))
     assert(data['service']['local']['url'].startswith('file://'))
     assert(len(data['service']['local']['images']) == 4)
+
+    # {'geocode': ('44/1 48568764/1000000 0/1', 'N', '79/1 42861227/1000000 0/1', 'W'), 'timestamp': datetime.datetime(2011, 9, 17, 2, 13, 38), 'original': datetime.datetime(2009, 3, 29, 10, 42, 38)}
+    img = album.lookupImage('filename', 'two-tags.jpg')
+    assert(img.filename == 'two-tags.jpg')
+    assert(img.title == 'two-tags.jpg')
+    assert(img.id.endswith(os.sep + 'two-tags.jpg'))
+    assert(img.tags == ['sky', 'tree'])
+    assert(img.size == 11788)
+    assert(img.metaHash == '46baf9337736c919c23c0a7e1eb27554d76e98ea07e528a84a73d27f4f6a7194')
+    assert(img.imageHash == '7989fac53fcf211aa0b3946a348e1d8d447f36aeab70d26ff2aa4cbbb050618e')
 
 
 
