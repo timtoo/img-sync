@@ -102,4 +102,11 @@ class Album(object):
         self.getImages()
         return self
 
+    def lookupImage(self, key, val):
+        """Iterate self.images and return image with given value on key"""
+        for i in self.images:
+            if getattr(i, key, None):
+                return i
+        return None
+
 
