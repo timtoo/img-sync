@@ -1,6 +1,7 @@
 """Code for handling local albums/images"""
 
 import os, time, datetime, re
+import logging
 from album import Album
 from image import Image
 
@@ -17,7 +18,7 @@ class LocalImage(Image):
         return datetime.datetime(*(time.localtime(st[8]))[0:6])
 
     def firstExiv2Val(self, keys, default=None, raw=False):
-        meta = self.getExiv2()
+        meta = self.meta
         if meta:
             for k in keys:
                 if k in meta.iptc_keys and meta[k].value or \
@@ -30,6 +31,7 @@ class LocalImage(Image):
         return default
 
     def openFile(self):
+        self.logger.debug("""Opening image: %s""", self.id)
         return open(self.id, 'rb')
 
     def setDetails(self):
@@ -38,10 +40,9 @@ class LocalImage(Image):
         self.title = self.filename
         self.size = os.stat(self.id)[6]
 
-        meta = self.getExiv2()
-        if meta:
-            if 'Exif.Photo.DateTimeOriginal' in meta.exif_keys:
-                self.original = meta['Exif.Photo.DateTimeOriginal'].value
+        if self.meta:
+            if 'Exif.Photo.DateTimeOriginal' in self.meta.exif_keys:
+                self.original = self.meta['Exif.Photo.DateTimeOriginal'].value
             else:
                 self.original = self.timestamp
 
@@ -55,9 +56,8 @@ class LocalImage(Image):
                          ), default=[])
 
     def setDescription(self):
-        meta = self.getExiv2()
-        if meta:
-            self.description = meta.comment
+        if self.meta:
+            self.description = self.meta.comment
         else:
             self.description =  ''
 
@@ -84,14 +84,13 @@ class LocalImage(Image):
     def setComments(self):
         pass
 
-    def getExiv2(self):
-        """Return exiv2 metadata object"""
-        if not hasattr(self, '_exiv2'):
-            self._exiv2 = None
-            if pyexiv2:
-                self._exiv2 = pyexiv2.ImageMetadata(self.id)
-                self._exiv2.read()
-        return self._exiv2
+    def makeMeta(self):
+        """meta means an exiv2 metadata object for local files"""
+        meta = None
+        if pyexiv2:
+            meta = pyexiv2.ImageMetadata(self.id)
+            meta.read()
+        return meta
 
     def calcImageHash(self):
         f = self.openFile()
@@ -129,7 +128,7 @@ class LocalAlbum(Album):
             if self.img_regex.search(fn):
                 path = self.id + os.sep + fn
                 i = LocalImage(path, filename=fn)
-                i.setMeta()
+                i.setAll()
                 self.images.append(i)
 
             # XXX todo
@@ -140,6 +139,9 @@ class LocalAlbum(Album):
 
 
 if __name__ == '__main__':
+    import logging
+    logging.basicConfig()
+
     import config
     c = config.Config()
     c.pprint()

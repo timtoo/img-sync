@@ -1,5 +1,6 @@
 import hashlib, json
 from cStringIO import StringIO
+import logging
 
 class Image(object):
     """Base object for represeting single images.
@@ -7,9 +8,13 @@ class Image(object):
     All of the set* methods must be overridden, to provide functionality.
     If a particular set* method is not needed, it still must be overridden
     to avoid an exception (to ensure it explicitely is not needed).
+
+    meta - an arbitrary object that can be passed in or set on an
+    image object. it may have different meaning specific to the service
+    an image belongs to.
     """
     def __init__(self, id, filename=None, timestamp=None, title=None,
-            description=None):
+            description=None, meta=None):
         self.service = {}
         self.id = id
         self.filename = filename
@@ -23,6 +28,15 @@ class Image(object):
         self.original = None
         self._hashMeta = None
         self._hashFile = None
+        self._meta = meta
+        self.logger = logging.getLogger('imgsync.image')
+
+    @property
+    def meta(self):
+        """Wrapper around self._meta to call makeMeta() if needed"""
+        if self._meta is None:
+            self._meta = self.makeMeta()
+        return self._meta
 
     @staticmethod
     def calcHash(source):
@@ -79,6 +93,7 @@ class Image(object):
         return self._hashMeta
 
     def openFile(self):
+        """Return a new file handle to the raw image"""
         raise RuntimeError, "openFile not implemented"
 
     def setDetails(self):
@@ -108,7 +123,11 @@ class Image(object):
         """ load object from config file"""
         pass
 
-    def setMeta(self):
+    def makeMeta(self):
+        """Code to return data for the self.meta object"""
+        pass
+
+    def setAll(self):
         self.setDetails()
         self.setTags()
         self.setDescription()
