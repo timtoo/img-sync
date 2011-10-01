@@ -61,6 +61,33 @@ class LocalImage(Image):
         else:
             self.description =  ''
 
+    @staticmethod
+    def exifGPS2Dec(st,ref):
+        """Convert the EXIF GPS format to decimal"""
+        # example: '44/1 48568764/1000000 0/1'
+        result = 0
+        factors = (1, 60, 3600)
+        parts = st.split()
+        for i in range(3):
+            val, divisor = parts[i].split('/')
+            result += int(val) / float(divisor) / factors[i]
+        if ref == 'W' or ref == 'S':
+            result = -result
+
+        return result
+
+    @staticmethod
+    def xmpGPS2Dec(st,ref):
+        """Convert the XMP GPS format to decimal"""
+        # example: '44,48.56876402N'
+        deg,min = st.split(',')
+        result = int(deg) + (float(min[:-1]) / 60)
+        if st[-1] == 'W' or st[-1] == 'S':
+            result = -result
+
+        return result
+
+
     def setGeolocation(self):
         latitude = self.firstExiv2Val((
                         'Exif.GPSInfo.GPSLatitude',
@@ -79,7 +106,15 @@ class LocalImage(Image):
                         'Xmp.exif.GPSLongitudeRef'
                          ), raw=True)
         if latitude:
-            self.geocode = (latitude, latitudeRef, longitude, longitudeRef)
+            if ' ' in latitude:
+                func = self.exifGPS2Dec
+            else:
+                func = self.xmpGPS2Dec
+
+            self.geocode = (
+                    func(latitude, latitudeRef),
+                    func(longitude, longitudeRef)
+                    )
 
     def setComments(self):
         pass
