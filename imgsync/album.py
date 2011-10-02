@@ -89,7 +89,7 @@ class Album(object):
         pass
 
     def getImages(self):
-        """Populate self.images"""
+        """Populate self.imagesi and call self.setAll() on each"""
         raise RuntimeError, "getImages not implemented"
 
     def getAlbumInfo(self):

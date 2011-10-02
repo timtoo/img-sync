@@ -116,7 +116,7 @@ class Image(object):
         raise RuntimeError, "setComments not implemented"
 
     def setGeolocation(self):
-        """Get any description associated with the object"""
+        """set self.geocode with (latitude, longitude)"""
         raise RuntimeError, "setGeolocation not implemented"
 
     def loadConfig(self, config, section):

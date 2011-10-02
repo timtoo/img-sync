@@ -1,8 +1,8 @@
 - The main purpose is to be able to keep local images and image metadata in
-  an album in sync with a remote album
+  an album in sync and diff with a remote album
 
     - The initial targets are:
-        - digikam and/or local file system
+        - local file system (possibly with digikam support)
         - picasaweb (using gdata api)
 
 - command line utility
