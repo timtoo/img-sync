@@ -1,3 +1,5 @@
+"""Parse command line and config/ini files and provide a dictionary-like interface"""
+
 import os
 import argparse
 import ConfigParser
