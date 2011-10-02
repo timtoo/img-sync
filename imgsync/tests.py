@@ -75,7 +75,6 @@ def test_local_misc():
 
     result = handle_local.LocalImage.xmpGPS2Dec(
             '44,48.56876402N', 'N')
-    print result
     assert(result == 44.8094794003333334)
 
 
@@ -84,6 +83,13 @@ def test_image():
 
     assert(i.calcHash('test') == '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08')
 
+
+def test_picasa():
+    import handle_picasa
+
+    album = handle_picasa.PicasaAlbum(None)
+
+    assert( album.registry.service.has_key('picasa') )
 
 
 
