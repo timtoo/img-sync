@@ -13,6 +13,7 @@ from image import Image
 class PicasaImage(Image):
 
     def openFile(self):
+        self.logger.debug("opening image: %s", self.id)
         return open('/etc/motd', 'r')
 
     def setDetails(self):
@@ -25,7 +26,7 @@ class PicasaImage(Image):
         pass
 
     def setGeolocation(self):
-        pass
+        self.geocode = (self.meta.geo.latitude(), self.meta.geo.longitude())
 
     def setComments(self):
         pass
@@ -33,13 +34,16 @@ class PicasaImage(Image):
     def calcImageHash(self):
         return ''
 
+    def makeMeta(self):
+        raise RuntimeError, "Not implemented"
+
 
 
 class PicasaAlbum(Album):
     """Adapt Album with support for picasa folder functionality. Album ID is
     the full path.
     """
-    service_name = 'local'
+    service_name = 'picasa'
 
     img_regex = re.compile(r'\.(png|jpg|jpeg)$', re.I)
 
@@ -55,15 +59,15 @@ class PicasaAlbum(Album):
         result = self.client.GetFeed(uri % self.id)
         self.images = []
         for p in result.entry:
-            i = PicasaImage(p.id.text, filename=p.content.src,
+            i = PicasaImage(p.gphoto_id.text, meta = p,
+                    filename=p.content.src,
                     timestamp=p.timestamp.datetime(),
                     title = p.title and p.title.text or None,
                     description = p.summary and p.summary.text or None)
+            i.setAll()
 
-            print self.registry.dumpDict(), 'x'
+            #print self.registry.dumpDict(), 'x'
             self.images.append(i)
-
-
 
     @property
     def client(self):
@@ -103,6 +107,7 @@ if __name__ == '__main__':
     album = PicasaAlbum('5649260481048764721')
     #album.printAlbumList()
     print album.getImages()
+    print album.registry.dumpDict()
 
 
 
