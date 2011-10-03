@@ -1,6 +1,7 @@
 """Code for handling local albums/images"""
 
 import os, time, datetime, re
+import urllib2
 
 import gdata.photos.service
 import gdata.media
@@ -11,27 +12,44 @@ from image import Image
 
 
 class PicasaImage(Image):
+        #  'albumid', 'author', 'category', 'checksum', 'client', 'commentCount', 'commentingEnabled', 'content', 'contributor', 'control', 'exif', 'extension_attributes', 'extension_elements', 'geo', 'gphoto_id', 'height', 'id', 'kind', 'link', 'media', 'position', 'published', 'rights', 'rotation', 'size', 'snippet', 'snippettype', 'source', 'summary', 'tags', 'text', 'timestamp', 'title', 'truncated', 'updated', 'version', 'width'
 
     def openFile(self):
         self.logger.debug("opening image: %s", self.id)
         return open('/etc/motd', 'r')
 
     def setDetails(self):
-        pass
+        self.size = int(self.meta.size.text)
+        self.original = self.meta.timestamp.datetime()
 
     def setTags(self):
-        pass
+        tags = self.meta.media.keywords.text
+        if tags:
+            self.tags = tags.split(', ')
 
     def setDescription(self):
+        # handled during instantiation
         pass
 
     def setGeolocation(self):
-        self.geocode = (self.meta.geo.latitude(), self.meta.geo.longitude())
+        if self.meta.geo.location():
+            self.geocode = (self.meta.geo.latitude(), self.meta.geo.longitude())
 
     def setComments(self):
-        pass
+        if self.meta.commentCount.text != '0':
+            uri = '/data/feed/api/user/default/albumid/%s/photoid/%s?kind=comment'
+            comments = self.album.client.GetFeed(uri % (self.meta.albumid.text, self.meta.gphoto_id.text))
+            self.comments = []
+            for e in comments.entry:
+                comment = e.content.text
+                if e.author:
+                    comment += '  --' + e.author[0].name.text
+                self.comments.append(comment)
 
     def calcImageHash(self):
+        self.logger.debug("Reading image from net... %s" % self.filename)
+        raw = urllib2.urlopen(self.meta.content.src)
+        return self.calcHash(raw)
         return ''
 
     def makeMeta(self):
@@ -54,7 +72,6 @@ class PicasaAlbum(Album):
         pass
 
     def getImages(self):
-        #  'albumid', 'author', 'category', 'checksum', 'client', 'commentCount', 'commentingEnabled', 'content', 'contributor', 'control', 'exif', 'extension_attributes', 'extension_elements', 'geo', 'gphoto_id', 'height', 'id', 'kind', 'link', 'media', 'position', 'published', 'rights', 'rotation', 'size', 'snippet', 'snippettype', 'source', 'summary', 'tags', 'text', 'timestamp', 'title', 'truncated', 'updated', 'version', 'width'
         uri = '/data/feed/api/user/default/albumid/%s?kind=photo'
         result = self.client.GetFeed(uri % self.id)
         self.images = []
@@ -63,7 +80,8 @@ class PicasaAlbum(Album):
                     filename=p.content.src,
                     timestamp=p.timestamp.datetime(),
                     title = p.title and p.title.text or None,
-                    description = p.summary and p.summary.text or None)
+                    description = p.summary and p.summary.text or None,
+                    album = self)
             i.setAll()
 
             #print self.registry.dumpDict(), 'x'
@@ -103,8 +121,10 @@ if __name__ == '__main__':
         uri = '/data/base/api/user/%s?kind=album' % (user,)
         return client.GetFeed(uri, limit=limit)
 
+    albumid = '5649260481048764721' # ?
+    albumid = '5658594342831965681' # imgsync
     #albums = client.GetUserFeed()
-    album = PicasaAlbum('5649260481048764721')
+    album = PicasaAlbum(albumid)
     #album.printAlbumList()
     print album.getImages()
     print album.registry.dumpDict()
