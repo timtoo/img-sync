@@ -12,9 +12,11 @@ class Image(object):
     meta - an arbitrary object that can be passed in or set on an
     image object. it may have different meaning specific to the service
     an image belongs to.
+
+    album - the album object that this photo belongs to
     """
     def __init__(self, id, filename=None, timestamp=None, title=None,
-            description=None, meta=None):
+            description=None, meta=None, album=None):
         self.service = {}
         self.id = id
         self.filename = filename
@@ -29,6 +31,7 @@ class Image(object):
         self._hashMeta = None
         self._hashFile = None
         self._meta = meta
+        self.album = album
         self.logger = logging.getLogger('imgsync.image')
 
     @property
