@@ -43,15 +43,20 @@ class Config(object):
         parser = argparse.ArgumentParser()
         parser.add_argument('local', nargs='*')
         parser.add_argument('--config')
-        parser.add_argument('--picasa-list', action='store_true', help="List Picasa albums and ID codes")
+        parser.add_argument('--picasa-list', action='store_true',
+                help="List Picasa albums and ID codes")
         parser.add_argument('--picasa-user')
         parser.add_argument('--picasa-password')
-        parser.add_argument('--picasa-title', help="Name of album on Picassa (if lookup needed)")
-        parser.add_argument('--picasa-id', help="ID of album on Picassa (overrides picasa-title)")
+        parser.add_argument('--picasa-title',
+                help="Name of album on Picassa (if lookup needed)")
+        parser.add_argument('--picasa-id',
+                help="ID of album on Picassa (overrides picasa-title)")
         parser.add_argument('-t', '--sync-to', choices=SERVICE)
-        parser.add_argument('-f', '--sync-from', choices=SERVICE)
-        parser.add_argument('--diff', action='store_true', help="Print differences rather than sync")
-
+        parser.add_argument('-f', '--sync-from', default='local',
+                choices=SERVICE)
+        parser.add_argument('--diff-with', action='store_true',
+                default='local',
+                choices=SERVICE, help="What to diff against")
 
         opts = parser.parse_args()
         for k in self.data.keys():

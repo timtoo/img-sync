@@ -139,6 +139,7 @@ class Image(object):
         return self
 
     def __iter__(self):
+        """Allows coverting the object to dictionary using dict() builtin"""
         config.set(section, 'id', self.id)
         config.set(section, 'hash', self.imageHash)
         config.set(section, 'meta', self.metaHash)
@@ -183,4 +184,29 @@ class Image(object):
         self.size and config.set(section, 'size', self.size)
         self.geocode and config.set(section, 'geocode', json.dumps(self.geocode))
         config.set(section, 'tags', json.dumps(self.tags))
+
+    def diffImage(self, image):
+        """Given an image object, return the differences as it exists on
+            this service.
+
+            Return dictionary containing keys of differences,
+            the values being True or other difference details if appropriate.
+
+            Return None if no matching image exists at this service.
+        """
+        raise RuntimeError, "Not implemented"
+
+    def storeImage(self, image):
+        """Pass the image object on the given service
+
+            This should update an existing matching image already stored on
+            the service if necessary/possible.
+        """
+        raise RuntimeError, "store Image not implemented for service"
+
+
+
+
+
+
 
