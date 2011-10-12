@@ -16,7 +16,7 @@ class PicasaImage(Image):
 
     def openFile(self):
         self.logger.debug("opening image: %s", self.id)
-        return open('/etc/motd', 'r')
+        return urllib2.urlopen(self.meta.content.src)
 
     def setDetails(self):
         self.size = int(self.meta.size.text)
@@ -33,7 +33,8 @@ class PicasaImage(Image):
 
     def setGeolocation(self):
         if self.meta.geo.location():
-            self.geocode = (self.meta.geo.latitude(), self.meta.geo.longitude())
+            self.geocode = (self.meta.geo.latitude(),
+                    self.meta.geo.longitude())
 
     def setComments(self):
         if self.meta.commentCount.text != '0':
@@ -48,9 +49,8 @@ class PicasaImage(Image):
 
     def calcImageHash(self):
         self.logger.debug("Reading image from net... %s" % self.filename)
-        raw = urllib2.urlopen(self.meta.content.src)
-        return self.calcHash(raw)
-        return ''
+        f = self.openFile()
+        return self.calcHash(f)
 
     def makeMeta(self):
         raise RuntimeError, "Not implemented"
@@ -125,9 +125,9 @@ if __name__ == '__main__':
     albumid = '5658594342831965681' # imgsync
     #albums = client.GetUserFeed()
     album = PicasaAlbum(albumid)
-    #album.printAlbumList()
-    print album.getImages()
-    print album.registry.dumpDict()
+    album.printAlbumList()
+    #print album.getImages()
+    #print album.registry.dumpDict()
 
 
 

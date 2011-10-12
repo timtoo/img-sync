@@ -109,4 +109,25 @@ class Album(object):
                 return i
         return None
 
+    def diffAlbum(self, album):
+        """Return dictionary of differences.
+
+            the "images" key will contain a dictionary
+            with the keys:
+
+                - different (contining list of
+                    image objects from this album with differences),
+                - same (containing images which match up),
+                - new (containing images not found in this album),
+                - unknown (images in this album which are not
+                    in the source album)
+
+        """
+
+    def createAlbum(self, album):
+        """Given an album object create/update album on this service
+        """
+
+
+
 
