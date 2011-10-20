@@ -8,6 +8,11 @@ c = config.Config()
 if c['local']:
     from imgsync.handle_local import LocalAlbum
     a = LocalAlbum(c['local'][0])
+    if a.exists():
+        a.load()
+        # load config
+
+
     data = a.getAlbum()
     #pprint.pprint( a.album.dumpDict() )
     print a.album.dumps()

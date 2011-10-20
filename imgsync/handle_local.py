@@ -145,7 +145,7 @@ class LocalAlbum(Album):
 
     def getAlbumInfo(self):
         path = self.id
-        if os.path.exists(path):
+        if self.exists():
             self.url = 'file://' + path
             # directory modification time
             self.date = LocalImage.stat2datetime(os.stat(self.id))
@@ -171,6 +171,10 @@ class LocalAlbum(Album):
             # - get tags from iptc keywords
             # - get geocode from
 
+    def exists(self):
+        return os.path.isdir(self.id)
+
+
 
 
 if __name__ == '__main__':
@@ -183,8 +187,9 @@ if __name__ == '__main__':
 
     a = LocalAlbum(c['local'][0])
     data = a.getAlbum()
-    #print a.registry.dumps()
-    print a.registry.dumpDict()
+    print a.registry.dumps()
+    print a.registry.dump()
+    #print a.registry.dumpDict()
 
 
 

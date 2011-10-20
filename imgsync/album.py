@@ -57,13 +57,20 @@ class AlbumRegistry(object):
             data['service'][s] = album
         return data
 
-    def dump(self, f):
+    def dump(self):
         """Gather all data into a simple dictionary stucture to provide
             to a storage backend"""
-        return self._storage(self).dump(f)
+        return self._storage(self).dump()
 
     def dumps(self):
         return self._storage(self).dumps()
+
+    def load(self, f):
+        """load stored config(s)"""
+        return self._storage(self).load()
+
+    def loads(self):
+        return self._storage(self).loads()
 
 
 
@@ -127,6 +134,12 @@ class Album(object):
     def createAlbum(self, album):
         """Given an album object create/update album on this service
         """
+
+    def exists(self):
+        """Return boolean result to a check whether this album
+            yet physically exists
+        """
+        raise RuntimeError, "exists not implemented"
 
 
 
