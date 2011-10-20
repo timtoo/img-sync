@@ -54,8 +54,7 @@ class Config(object):
         parser.add_argument('-t', '--sync-to', choices=SERVICE)
         parser.add_argument('-f', '--sync-from', default='local',
                 choices=SERVICE)
-        parser.add_argument('--diff-with', action='store_true',
-                default='local',
+        parser.add_argument('--diff-with', default='local',
                 choices=SERVICE, help="What to diff against")
 
         opts = parser.parse_args()
