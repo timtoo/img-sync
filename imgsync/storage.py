@@ -45,9 +45,15 @@ class LocalFileStorage(Storage):
         path = self.album.service['local'].id
         return path + os.sep + self.FILENAME
 
+    def exists(self):
+        return os.path.exists(self.filename)
+
     def _addVal(self, config, section, data, key):
         if data.get(key):
-            config.set(section, key, data[key] or '')
+            if isinstance(data[key], (tuple, list)):
+                config.set(section, key, json.dumps(data[key]))
+            else:
+                config.set(section, key, data[key] or '')
 
     def _dumpImage(self, config, section, image):
         """Dump image data data to a config file"""
@@ -102,8 +108,47 @@ class LocalFileStorage(Storage):
         self._dump(f)
         return f.getvalue()
 
-    def load(self, f):
+    def _sectionToDict(self, config, section, data):
+        """Read a ConfigFile section and store info in dict"""
+        for k, v in config.items(section):
+            print (k,v)
+            if k in ('timestamp', 'original'):
+                if '.' in v:
+                    v = datetime.datetime.strptime(v,
+                            '%Y-%m-%d %H:%M:%S.%f')
+                else:
+                    v = datetime.datetime.strptime(v,
+                            '%Y-%m-%d %H:%M:%S')
+            elif k in ('count', 'size'):
+                v = int(v)
+            elif k in ('geocode',):
+                v = json.loads(v)
+            elif k in ('tags',):
+                v = json.loads(v)
+            data[k] = v
+        return data
+
+    def load(self):
         """
         """
+        data = { 'service': {} }
+        if self.exists():
+            config = ConfigParser.ConfigParser()
+            config.read([self.filename])
+            data['config'] = config.get('global', 'config')
+            service = config.get('global', 'service')
+            service = [ x.strip() for x in service.split(',') if x.strip() ]
+            for s in service:
+                data['service'][s] = { 'images': [] }
+                self._sectionToDict(config, s, data['service'][s])
+                if data['service'][s].get('count'):
+                    for i in range(data['service'][s]['count']):
+                        photo = {}
+                        self._sectionToDict(config, s+'-image-'+str(i+1),
+                                photo)
+                        data['service'][s]['images'].append(photo)
+
+        print data
+
 
 
