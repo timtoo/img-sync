@@ -111,7 +111,6 @@ class LocalFileStorage(Storage):
     def _sectionToDict(self, config, section, data):
         """Read a ConfigFile section and store info in dict"""
         for k, v in config.items(section):
-            print (k,v)
             if k in ('timestamp', 'original'):
                 if '.' in v:
                     v = datetime.datetime.strptime(v,
@@ -148,7 +147,7 @@ class LocalFileStorage(Storage):
                                 photo)
                         data['service'][s]['images'].append(photo)
 
-        print data
+        return self.album.loadDict(data)
 
 
 
