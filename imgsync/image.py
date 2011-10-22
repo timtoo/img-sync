@@ -153,6 +153,20 @@ class Image(object):
         self.geocode and config.set(section, 'geocode', json.dumps(self.geocode))
         config.set(section, 'tags', json.dumps(self.tags))
 
+    def loadDict(self, data):
+        """Take dictionary from data into object"""
+        self._hashFile = data.get('hash')
+        self._hashMeta = data.get('meta')
+        self.filename = data.get('filename')
+        self.title = data.get('title')
+        self.description = data.get('description')
+        self.timestamp = data.get('timestamp')
+        self.original = data.get('original')
+        self.size = data.get('size')
+        self.geocode = data.get('geocode')
+        self.tags = data.get('tags')
+        return self
+
     def dumpDict(self):
         """Dump object data to a config file"""
         data = {

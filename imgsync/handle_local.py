@@ -186,12 +186,14 @@ if __name__ == '__main__':
     c.pprint()
 
     a = LocalAlbum(c['local'][0])
+    #data = a.getAlbum()
+    print a.registry.load()
+    #print a.registry.dump()
+    #print a.registry.dumps()
+    print a.registry.dumpDict()
+
+    a = LocalAlbum(c['local'][0])
     data = a.getAlbum()
-    print a.registry.dumps()
-    print a.registry.dump()
-    #print a.registry.dumpDict()
-
-
-
+    print a.registry.dumpDict()
 
 
