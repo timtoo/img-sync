@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import pprint
-from imgsync import config, album
+from imgsync import config, registry
 
 c = config.Config()
 
@@ -9,7 +9,7 @@ c = config.Config()
 if c['local']:
     from imgsync.handle_local import LocalAlbum
     for local_album in c['local']:
-        album = LocalAlbum(local_album)
+        registry, album = registry.AlbumRegistry().new('local', local_album)
         if album.exists():
             album.load()
 
@@ -19,7 +19,7 @@ if c['local']:
 
     data = a.getAlbum()
     #pprint.pprint( a.album.dumpDict() )
-    print a.album.dumps()
+    print album.dumps()
 
 
 

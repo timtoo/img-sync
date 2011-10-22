@@ -50,7 +50,7 @@ def test_local():
     assert(len(album.images) == 4)
 
     # create local album via registry
-    registry, album = AlbumRegistry().newAlbum('local', path)
+    registry, album = AlbumRegistry().new('local', path)
     album.getAlbum()
 
     data = registry.dumpDict()
@@ -95,7 +95,7 @@ def test_picasa():
     album = handle_picasa.PicasaAlbum(None)
 
     # create object via registry
-    registry, album = AlbumRegistry().newAlbum('picasa', None)
+    registry, album = AlbumRegistry().new('picasa', None)
     assert( registry.service.has_key('picasa') )
 
 
