@@ -6,7 +6,6 @@ import urllib2
 import gdata.photos.service
 import gdata.media
 import gdata.geo
-
 from album import Album
 from image import Image
 

@@ -2,8 +2,7 @@
 
 import os, time, datetime, re
 import logging
-from album import Album
-from image import Image
+from registry import Album, Image, AlbumRegistry
 
 try:
     import pyexiv2
@@ -185,15 +184,15 @@ if __name__ == '__main__':
     c = config.Config()
     c.pprint()
 
-    a = LocalAlbum(c['local'][0])
-    #data = a.getAlbum()
-    print a.registry.load()
+    registry = AlbumRegistry()
+    a = registry.newAlbum('local', c['local'][0])
+    print registry.load()
+    print 'cache', registry.dumpDict()
+
+    reg, a = AlbumRegistry().newAlbum('local', c['local'][0])
+    data = a.getAlbum()
     #print a.registry.dump()
     #print a.registry.dumps()
-    print a.registry.dumpDict()
-
-    a = LocalAlbum(c['local'][0])
-    data = a.getAlbum()
-    print a.registry.dumpDict()
+    print 'raw  ', reg.dumpDict()
 
 

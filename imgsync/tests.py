@@ -6,8 +6,7 @@ from cStringIO import StringIO
 # remove nose command line arguments before running tests (before Config sees them)
 sys.argv = sys.argv[:1]
 
-from album import AlbumRegistry
-from image import Image
+from registry import AlbumRegistry, Album, Image
 
 
 def test_registry():
@@ -40,8 +39,8 @@ def test_local():
     # album id is absolute path with trailing slash removed
     assert(album.id == os.path.abspath(path).rstrip('/'))
 
-    # album has registry isntance
-    assert(isinstance(album.registry, AlbumRegistry))
+    # album does not have registry isntance (as old versions did)
+    assert(not hasattr(album, 'registry'))
 
     # no images
     assert(len(album.images) == 0)
@@ -50,7 +49,11 @@ def test_local():
     assert(isinstance(album.getAlbum(), handle_local.LocalAlbum))
     assert(len(album.images) == 4)
 
-    data = album.registry.dumpDict()
+    # create local album via registry
+    registry, album = AlbumRegistry().newAlbum('local', path)
+    album.getAlbum()
+
+    data = registry.dumpDict()
     assert(data.has_key('service'))
     assert(data['service'].has_key('local'))
     assert(data['service']['local']['url'].startswith('file://'))
@@ -58,6 +61,7 @@ def test_local():
 
     # {'geocode': ('44/1 48568764/1000000 0/1', 'N', '79/1 42861227/1000000 0/1', 'W'), 'timestamp': datetime.datetime(2011, 9, 17, 2, 13, 38), 'original': datetime.datetime(2009, 3, 29, 10, 42, 38)}
     img = album.lookupImage('filename', 'two-tags.jpg')
+    print img.filename
     assert(img.filename == 'two-tags.jpg')
     assert(img.title == 'two-tags.jpg')
     assert(img.id.endswith(os.sep + 'two-tags.jpg'))
@@ -87,9 +91,12 @@ def test_image():
 def test_picasa():
     import handle_picasa
 
+    # create object directly
     album = handle_picasa.PicasaAlbum(None)
 
-    assert( album.registry.service.has_key('picasa') )
+    # create object via registry
+    registry, album = AlbumRegistry().newAlbum('picasa', None)
+    assert( registry.service.has_key('picasa') )
 
 
 

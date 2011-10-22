@@ -5,12 +5,16 @@ from imgsync import config, album
 
 c = config.Config()
 
+
 if c['local']:
     from imgsync.handle_local import LocalAlbum
-    a = LocalAlbum(c['local'][0])
-    if a.exists():
-        a.load()
-        # load config
+    for local_album in c['local']:
+        album = LocalAlbum(local_album)
+        if album.exists():
+            album.load()
+
+    if c.get('sync_to'):
+
 
 
     data = a.getAlbum()
