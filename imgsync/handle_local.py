@@ -189,7 +189,7 @@ if __name__ == '__main__':
     print registry.load()
     print 'cache', registry.dumpDict()
 
-    reg, a = AlbumRegistry().newAlbum('local', c['local'][0])
+    reg, a = AlbumRegistry().new('local', c['local'][0])
     data = a.getAlbum()
     #print a.registry.dump()
     #print a.registry.dumps()
