@@ -2,6 +2,8 @@ import datetime
 
 from storage import LocalFileStorage
 from config import Config
+from image import Image
+
 
 class AlbumRegistry(object):
     """A singleton intended for all Album instances to share
@@ -57,6 +59,38 @@ class AlbumRegistry(object):
             data['service'][s] = album
         return data
 
+    def loadDict(self, data):
+        """Load object data from config dictionary"""
+        # need to load the particular proper album/image object for the service type
+        # means we need a registry somewhere mapping objects to service name - or else rely on name convention and make them accessable somewhere.
+        for service_name in data['service'].keys():
+
+            if not self.service.has_key(service_name):
+                self.service[service_name] = ServicePlugin.createAlbum(service_name, data[service_name]['id'])
+            service = self.service[service_name]
+            service.title = data['service'][service_name]['title']
+            service.description = data['service'][service_name]['description']
+            service.date = data['service'][service_name]['date']
+            service.url = data['service'][service_name]['url']
+            service.timestamp = data['service'][service_name]['timestamp']
+            service.images = []
+
+            for idata in data['service'][service_name]['images']:
+                image = ServicePlugin.createImage(service_name, idata['id'])
+                image.loadDict(idata)
+                service.images.append(image)
+
+        return self
+
+
+
+
+
+
+
+
+
+
     def dump(self):
         """Gather all data into a simple dictionary stucture to provide
             to a storage backend"""
@@ -65,9 +99,10 @@ class AlbumRegistry(object):
     def dumps(self):
         return self._storage(self).dumps()
 
-    def load(self, f):
+    def load(self):
         """load stored config(s)"""
-        return self._storage(self).load()
+        data = self._storage(self).load()
+
 
     def loads(self):
         return self._storage(self).loads()
@@ -141,6 +176,46 @@ class Album(object):
         """
         raise RuntimeError, "exists not implemented"
 
+
+import os
+import inspect
+class ServicePlugin(object):
+
+    _service = {}
+
+    _path = os.path.abspath(os.path.dirname(__file__))
+    handlers = [ os.path.split(x)[-1].split('.')[0][7:] for x in os.listdir(_path) if os.path.split(x)[-1].startswith('handle_') ]
+
+    @staticmethod
+    def load():
+        for h in ServicePlugin.handlers:
+            ServicePlugin._service[h] = {
+                'album': None,
+                'image': None,
+                }
+            module = __import__('handle_'+h, globals(), locals())
+            for o in dir(module):
+                if inspect.isclass(getattr(module, o)):
+                    if issubclass(getattr(module, o), Album):
+                        ServicePlugin._service[h]['album'] = getattr(module, o)
+                    elif issubclass(getattr(module, o), Image):
+                        ServicePlugin._service[h]['image'] = getattr(module, o)
+
+
+    @staticmethod
+    def createAlbum(service_name, *arg, **kw):
+        """Return an Album instance for the given service"""
+        if ServicePlugin.service.has_key(service_name):
+            return ServicePlugin._service[service_name]['album'](*arg, **kw)
+
+    @staticmethod
+    def createImage(service_name, *arg, **kw):
+        """Return an Image instance for the given service"""
+        if ServicePlugin._service.has_key(service_name):
+            return ServicePlugin._service[service_name]['image'](*arg, **kw)
+
+
+ServicePlugin.load()
 
 
 
