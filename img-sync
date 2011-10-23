@@ -5,21 +5,24 @@ from imgsync import config, registry
 
 c = config.Config()
 
+if c.opts.print_config:
+    c.pprint()
 
-if c['local']:
-    from imgsync.handle_local import LocalAlbum
-    for local_album in c['local']:
+if c.opts.list:
+    registry, album = registry.AlbumRegistry().new(c.opts.list, None)
+    album.printAlbumList()
+
+elif c.opts.local:
+    for local_album in c.local:
         registry, album = registry.AlbumRegistry().new('local', local_album)
         if album.exists():
             album.load()
 
-    if c.get('sync_to'):
+        if c.opts.diff_with:
+            pass
 
 
 
-    data = a.getAlbum()
-    #pprint.pprint( a.album.dumpDict() )
-    print album.dumps()
 
 
 

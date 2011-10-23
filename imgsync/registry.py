@@ -23,10 +23,11 @@ class AlbumRegistry(object):
         self._storage = storage
         self.config = Config()
 
-    def register(self, service_name, albumid, *arg, **kw):
+    def new(self, service_name, albumid, *arg, **kw):
         """Create an album object for the specified service.
         Returns self (registry object), as well as album object for convenience."""
-        self.service[service_name] = ServicePlugin.createAlbum(service_name, albumid, *arg, **kw)
+        self.service[service_name] = ServicePlugin.createAlbum(service_name, albumid,
+                self.config, *arg, **kw)
         return self, self.service[service_name]
 
     def dumpDict(self):
@@ -69,7 +70,8 @@ class AlbumRegistry(object):
         for service_name in data['service'].keys():
 
             if not self.service.has_key(service_name):
-                self.service[service_name] = ServicePlugin.createAlbum(service_name, data[service_name]['id'])
+                self.service[service_name] = ServicePlugin.createAlbum(
+                        service_name, data[service_name]['id'], self.config)
             service = self.service[service_name]
             service.title = data['service'][service_name]['title']
             service.description = data['service'][service_name]['description']
@@ -104,7 +106,14 @@ class AlbumRegistry(object):
 
 import os
 import inspect
+
 class ServicePlugin(object):
+    """Dynamically import service plugins and provide methods for creating
+    album and image objects for specified services.
+
+    Originally this was in a separate module, but there were circular import
+    problems so the code just ended up here.
+    """
 
     _service = {}
 
@@ -113,6 +122,7 @@ class ServicePlugin(object):
 
     @staticmethod
     def load():
+        """Find all handle_*.py modules, and scan them for subclasses of Album and Image"""
         for h in ServicePlugin.handlers:
             ServicePlugin._service[h] = {
                 'album': None,
@@ -128,10 +138,10 @@ class ServicePlugin(object):
 
 
     @staticmethod
-    def createAlbum(service_name, albumid, *arg, **kw):
+    def createAlbum(service_name, albumid, config, *arg, **kw):
         """Return an Album instance for the given service"""
         if ServicePlugin._service.has_key(service_name):
-            return ServicePlugin._service[service_name]['album'](albumid, *arg, **kw)
+            return ServicePlugin._service[service_name]['album'](albumid, config, *arg, **kw)
 
     @staticmethod
     def createImage(service_name, imageid, *arg, **kw):
