@@ -69,13 +69,26 @@ def test_local():
     assert(img.metaHash == '54c72aa0acd6b5c124b97eb155c8df8c42c23faea4d90b7d6bbd8c796094d8e3')
     assert(img.imageHash == '7989fac53fcf211aa0b3946a348e1d8d447f36aeab70d26ff2aa4cbbb050618e')
 
+    # see what happens if --check-meta is turned on
+    sys.argv.append('--check-meta')
+    registry, album = AlbumRegistry().new('local', path)
+    album.scan()
+
+    img = album.lookupImage('filename', 'two-tags.jpg')
+    assert(img.metaHash == '54c72aa0acd6b5c124b97eb155c8df8c42c23faea4d90b7d6bbd8c796094d8e3')
+    assert(img.imageHash is None)
+
+    sys.argv = sys.argv[:1]
+
 def test_local_misc():
     import handle_local
 
+    # normalize exif geocode
     result = handle_local.LocalImage.exifGPS2Dec(
             '44/1 48568764/1000000 0/1', 'N')
     assert(result == 44.8094794000000001)
 
+    # normalize xmp geocode
     result = handle_local.LocalImage.xmpGPS2Dec(
             '44,48.56876402N', 'N')
     assert(result == 44.8094794003333334)
