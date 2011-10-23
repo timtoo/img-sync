@@ -138,6 +138,10 @@ class LocalAlbum(Album):
     img_regex = re.compile(r'\.(png|jpg|jpeg)$', re.I)
 
     def postinit(self):
+        # reverse the usual default for --check-all unless --check-meta is explicit
+        if self.config and (not self.config.opts.check_meta):
+            self.config.opts.check_all = True
+
         if self.id:
             # clean/normalize path
             self.id = os.path.abspath(self.id.strip().rstrip(os.sep))
@@ -161,7 +165,7 @@ class LocalAlbum(Album):
             # recognize image files by extension
             if self.img_regex.search(fn):
                 path = self.id + os.sep + fn
-                i = LocalImage(path, filename=fn)
+                i = LocalImage(path, filename=fn, album=self)
                 i.setAll()
                 self.images.append(i)
 

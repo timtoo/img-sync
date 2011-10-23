@@ -58,6 +58,16 @@ class Config(object):
                 choices=SERVICE)
         parser.add_argument('-d', '--diff-with', default='local',
                 choices=SERVICE, help="What to diff against")
+        parser.add_argument('--check-all', action='store_true', default=False,
+                help="Force checking raw image file for changes (slow)")
+        parser.add_argument('--check-meta', action='store_true', default=False,
+                help="Force checking only meta-data for local album changes")
+        parser.add_argument('--no-write', action='store_true', default=False,
+                help="Do not upload/write files or update cache info")
+        parser.add_argument('--interactive', action='store_true', default=False,
+                help="Prompt before taking some actions")
+        parser.add_argument('--verbose', action='store_true', default=False,
+                help="Display extra information when available")
 
         opts = parser.parse_args()
         for k in self.data.keys():
