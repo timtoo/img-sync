@@ -4,7 +4,7 @@ import os
 import argparse
 import ConfigParser
 
-SERVICE = ( 'digikam', 'picasa', )  # this really should be dynamic from ServicePlugin._service
+SERVICE = ( 'local', 'picasa', )  # this really should be dynamic from ServicePlugin._service
 
 class Config(object):
     """Unfied interface to commandline and config file options.
