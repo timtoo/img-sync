@@ -45,13 +45,13 @@ def test_local():
     # no images
     assert(len(album.images) == 0)
 
-    # try to execute getAlbum and see if it returns itself
-    assert(isinstance(album.getAlbum(), handle_local.LocalAlbum))
+    # try to execute scan and see if it returns itself
+    assert(isinstance(album.scan(), handle_local.LocalAlbum))
     assert(len(album.images) == 4)
 
     # create local album via registry
     registry, album = AlbumRegistry().new('local', path)
-    album.getAlbum()
+    album.scan()
 
     data = registry.dumpDict()
     assert(data.has_key('service'))

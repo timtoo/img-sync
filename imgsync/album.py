@@ -19,18 +19,18 @@ class Album(object):
         """Stuff to do by subclasses after __init__ takes place"""
         pass
 
-    def getImages(self):
+    def scanImages(self):
         """Populate self.imagesi and call self.setAll() on each"""
         raise RuntimeError, "getImages not implemented"
 
-    def getAlbumInfo(self):
+    def scanInfo(self):
         """Set the album attributes"""
-        raise RuntimeError, "getAlbumInfo not implemented"
+        raise RuntimeError, "scanInfo not implemented"
 
-    def getAlbum(self):
-        """Load album info and list of image objects"""
-        self.getAlbumInfo()
-        self.getImages()
+    def scan(self):
+        """Scan album for info and list of image objects"""
+        self.scanInfo()
+        self.scanImages()
         return self
 
     def lookupImage(self, key, val):
