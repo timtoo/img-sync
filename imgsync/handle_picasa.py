@@ -90,8 +90,8 @@ class PicasaAlbum(Album):
     def client(self):
         if not self._client:
             client = gdata.photos.service.PhotosService()
-            client.email = self.registry.config['service']['picasa']['user']
-            client.password = self.registry.config['service']['picasa']['password']
+            client.email = self.config['service']['picasa']['user']
+            client.password = self.config['service']['picasa']['password']
             client.source = 'img-sync'
             client.ProgrammaticLogin()
             self._client = client
