@@ -5,13 +5,14 @@ class Album(object):
     """
     service_name = ''
 
-    def __init__(self, id):
+    def __init__(self, id, config=None):
         self.id = id
         self.title = None
         self.description = None
         self.date = None
         self.url = None
         self.images = []
+        self.config = config
         self.postinit()
 
     def postinit(self):
@@ -63,5 +64,12 @@ class Album(object):
             yet physically exists
         """
         raise RuntimeError, "exists not implemented"
+
+    def getAlbumList(self):
+        raise RuntimeError, "getting album list not implemented"
+
+    def printAlbumList(self):
+        print "Printing album list for %s service is not available." % self.service_name
+
 
 
