@@ -41,14 +41,17 @@ class Image(object):
             self._meta = self.makeMeta()
         return self._meta
 
-    @staticmethod
-    def calcHash(source):
+    def calcHash(self, source):
         """Given a file handle or string, return a hash string; this method
         is to standardize the hashing method for all handlers
         """
         if source:
             if not hasattr(source, 'read'):
                 source = StringIO(source)
+            else:
+                # if this is a file handle, assume image file and check config permission
+                if self.album.config and ((self.album.config.opts.check_meta) or (not self.album.config.opts.check_all)):
+                    return None
 
             hash = hashlib.sha256()
             while True:
@@ -91,6 +94,7 @@ class Image(object):
             self.tags and data.append(','.join(self.tags))
             self.geocode and data.append(json.dumps(self.geocode))
             self.original and data.append(str(self.original))
+            # should size (bytes) be added?
 
             self._hashMeta = self.calcHash('\n'.join(data))
         return self._hashMeta
@@ -122,15 +126,12 @@ class Image(object):
         """set self.geocode with (latitude, longitude)"""
         raise RuntimeError, "setGeolocation not implemented"
 
-    def loadConfig(self, config, section):
-        """ load object from config file"""
-        pass
-
     def makeMeta(self):
         """Code to return data for the self.meta object"""
         pass
 
     def setAll(self):
+        """Execute all the self.set* methods to attach data to image"""
         self.setDetails()
         self.setTags()
         self.setDescription()
@@ -138,7 +139,7 @@ class Image(object):
         self.setComments()
         return self
 
-    def __iter__(self):
+    def __deprecated__iter__(self):
         """Allows coverting the object to dictionary using dict() builtin"""
         config.set(section, 'id', self.id)
         config.set(section, 'hash', self.imageHash)
@@ -183,21 +184,6 @@ class Image(object):
         if self.geocode: data['geocode'] = self.geocode
         if self.tags: data['tags'] = self.tags
         return data
-
-    def dumpConfig(self, config, section):
-        """Dump object data to a config file"""
-        config.set(section, 'id', self.id)
-        config.set(section, 'hash', self.imageHash)
-        config.set(section, 'meta', self.metaHash)
-        self.filename and config.set(section, 'filename', self.filename or '')
-        self.title and config.set(section, 'title', self.title or '')
-        self.description and config.set(section, 'description',
-                self.description or '')
-        self.timestamp and config.set(section, 'timestamp', self.timestamp)
-        self.original and config.set(section, 'original', self.original)
-        self.size and config.set(section, 'size', self.size)
-        self.geocode and config.set(section, 'geocode', json.dumps(self.geocode))
-        config.set(section, 'tags', json.dumps(self.tags))
 
     def diffImage(self, image):
         """Given an image object, return the differences as it exists on

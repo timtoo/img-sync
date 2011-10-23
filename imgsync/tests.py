@@ -61,7 +61,6 @@ def test_local():
 
     # {'geocode': ('44/1 48568764/1000000 0/1', 'N', '79/1 42861227/1000000 0/1', 'W'), 'timestamp': datetime.datetime(2011, 9, 17, 2, 13, 38), 'original': datetime.datetime(2009, 3, 29, 10, 42, 38)}
     img = album.lookupImage('filename', 'two-tags.jpg')
-    print img.filename
     assert(img.filename == 'two-tags.jpg')
     assert(img.title == 'two-tags.jpg')
     assert(img.id.endswith(os.sep + 'two-tags.jpg'))
