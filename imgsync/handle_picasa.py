@@ -67,10 +67,10 @@ class PicasaAlbum(Album):
     def postinit(self):
         self._client = None
 
-    def getAlbumInfo(self):
+    def scanInfo(self):
         pass
 
-    def getImages(self):
+    def scanImages(self):
         uri = '/data/feed/api/user/default/albumid/%s?kind=photo'
         result = self.client.GetFeed(uri % self.id)
         self.images = []

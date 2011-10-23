@@ -142,7 +142,7 @@ class LocalAlbum(Album):
             # clean/normalize path
             self.id = os.path.abspath(self.id.strip().rstrip(os.sep))
 
-    def getAlbumInfo(self):
+    def scanInfo(self):
         path = self.id
         if self.exists():
             self.url = 'file://' + path
@@ -155,7 +155,7 @@ class LocalAlbum(Album):
         else:
             raise ValueError, "Album path does not exist: %s" % self.id
 
-    def getImages(self):
+    def scanImages(self):
         files = os.listdir(self.id)
         for fn in files:
             # recognize image files by extension
@@ -190,7 +190,7 @@ if __name__ == '__main__':
     print 'cache', registry.dumpDict()
 
     reg, a = AlbumRegistry().new('local', c['local'][0])
-    data = a.getAlbum()
+    data = a.scan()
     #print a.registry.dump()
     #print a.registry.dumps()
     print 'raw  ', reg.dumpDict()
