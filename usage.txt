@@ -14,7 +14,7 @@ Common Usage Options
 (Options in square brackets are defaults, so not needed to be specified)
 
 
---diff-with local [--sync-from local]
+--diff-with local [--sync-from local] <path>
 
     - display differences between local file and cache
     - if --verbose than display all local info and cache info first
@@ -22,7 +22,7 @@ Common Usage Options
     - if --check-meta is specified, then only diff meta data
 
 
---sync-to local [--sync-from local]
+--sync-to local [--sync-from local] <path>
 
     - this basically upades the local cache
     - if --verbose, display the diff first

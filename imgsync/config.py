@@ -4,7 +4,7 @@ import os
 import argparse
 import ConfigParser
 
-SERVICE = ( 'digikam', 'picasa', )
+SERVICE = ( 'digikam', 'picasa', )  # this really should be dynamic from ServicePlugin._service
 
 class Config(object):
     """Unfied interface to commandline and config file options.
@@ -42,19 +42,21 @@ class Config(object):
         """Get options from command line"""
         parser = argparse.ArgumentParser()
         parser.add_argument('local', nargs='*')
-        parser.add_argument('--config')
-        parser.add_argument('--picasa-list', action='store_true',
-                help="List Picasa albums and ID codes")
+        parser.add_argument('--config', help="specify config file")
+        parser.add_argument('--print-config', action='store_true',
+                help="display config after parsing config file and command line.")
         parser.add_argument('--picasa-user')
         parser.add_argument('--picasa-password')
         parser.add_argument('--picasa-title',
                 help="Name of album on Picassa (if lookup needed)")
         parser.add_argument('--picasa-id',
                 help="ID of album on Picassa (overrides picasa-title)")
+        parser.add_argument('-l', '--list', choices=SERVICE,
+                help="List all albums on a specified service, if possible")
         parser.add_argument('-t', '--sync-to', choices=SERVICE)
         parser.add_argument('-f', '--sync-from', default='local',
                 choices=SERVICE)
-        parser.add_argument('--diff-with', default='local',
+        parser.add_argument('-d', '--diff-with', default='local',
                 choices=SERVICE, help="What to diff against")
 
         opts = parser.parse_args()
@@ -118,8 +120,13 @@ class Config(object):
     def pprint(self):
         """Pretty Print the contents of the config object, for debugging"""
         import pprint
-        print '# Config file: %r' % self._config_path
+        print '### Config file: %r' % self._config_path
         pprint.pprint(self.data)
+        print '### Command line options:'
+        pprint.pprint(self.opts)
+        print '### Command line arguments:'
+        pprint.pprint(self.args)
+        print
 
 
 if __name__ == '__main__':
