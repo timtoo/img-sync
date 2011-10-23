@@ -1,0 +1,34 @@
+General option modifiers
+------------------------
+
+--no-write       # do not write/upload any changes
+--verbose        # show extra information when available
+--interactive    # prompt for confirmation before doing some actions
+--check-all      # use meta and file hashes for comparisons (can be slow)
+--check-meta     # only compare meta data hashes/changes
+
+
+Common Usage Options
+--------------------
+
+(Options in square brackets are defaults, so not needed to be specified)
+
+
+--diff-with local [--sync-from local]
+
+    - display differences between local file and cache
+    - if --verbose than display all local info and cache info first
+    - --check-all the default for local albums
+    - if --check-meta is specified, then only diff meta data
+
+
+--sync-to local [--sync-from local]
+
+    - this basically upades the local cache
+    - if --verbose, display the diff first
+    - if --no-write then don't write the updated the cache
+    - if --interactive then display --verbose info and prompt before writing
+    - --check-all the default for local albums
+    - if --check-meta is specified, then only diff meta data
+
+
