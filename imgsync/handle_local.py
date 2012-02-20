@@ -110,10 +110,10 @@ class LocalImage(Image):
             else:
                 func = self.xmpGPS2Dec
 
-            self.geocode = (
+            self.geocode = [
                     func(latitude, latitudeRef),
                     func(longitude, longitudeRef)
-                    )
+                    ]
 
     def setComments(self):
         pass

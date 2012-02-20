@@ -47,19 +47,7 @@ class AlbumRegistry(object):
         """
         data = { 'service': { } }
         for s in sorted(self.service.keys()):
-            album = {
-                    'id': self.service[s].id,
-                    'title': self.service[s].title,
-                    'description': self.service[s].description,
-                    'date': self.service[s].date,
-                    'url': self.service[s].url,
-                    'timestamp': datetime.datetime.now(),
-                    'images': []
-                }
-
-            for i in self.service[s].images:
-                album['images'].append(i.dumpDict())
-
+            album = self.service[s].dumpDict()
             data['service'][s] = album
         return data
 

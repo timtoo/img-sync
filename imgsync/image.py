@@ -30,6 +30,7 @@ class Image(object):
         self.original = None
         self._hashMeta = None
         self._hashFile = None
+        self.localid = None
         self._meta = meta
         self.album = album
         self.logger = logging.getLogger('imgsync.image')
@@ -139,21 +140,6 @@ class Image(object):
         self.setComments()
         return self
 
-    def __deprecated__iter__(self):
-        """Allows coverting the object to dictionary using dict() builtin"""
-        config.set(section, 'id', self.id)
-        config.set(section, 'hash', self.imageHash)
-        config.set(section, 'meta', self.metaHash)
-        self.filename and config.set(section, 'filename', self.filename or '')
-        self.title and config.set(section, 'title', self.title or '')
-        self.description and config.set(section, 'description',
-                self.description or '')
-        self.timestamp and config.set(section, 'timestamp', self.timestamp)
-        self.original and config.set(section, 'original', self.original)
-        self.size and config.set(section, 'size', self.size)
-        self.geocode and config.set(section, 'geocode', json.dumps(self.geocode))
-        config.set(section, 'tags', json.dumps(self.tags))
-
     def loadDict(self, data):
         """Take dictionary from data into object"""
         self._hashFile = data.get('hash')
@@ -163,6 +149,7 @@ class Image(object):
         self.description = data.get('description')
         self.timestamp = data.get('timestamp')
         self.original = data.get('original')
+        self.localid = data.get('localid')
         self.size = data.get('size')
         self.geocode = data.get('geocode')
         self.tags = data.get('tags')
@@ -180,6 +167,7 @@ class Image(object):
         if self.description: data['description'] = self.description
         if self.timestamp: data['timestamp'] = self.timestamp
         if self.original: data['original'] = self.original
+        if self.localid: data['localid'] = self.localid
         if self.size: data['size'] = self.size
         if self.geocode: data['geocode'] = self.geocode
         if self.tags: data['tags'] = self.tags
