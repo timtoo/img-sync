@@ -3,6 +3,7 @@
 import os
 import argparse
 import ConfigParser
+import re
 
 SERVICE = ( 'local', 'picasa', )  # this really should be dynamic from ServicePlugin._service
 
@@ -13,7 +14,7 @@ class Config(object):
     """
 
     def __init__(self):
-        self._config_filename = '.img-sync.rc'
+        self._config_filename = '.img-sync.cfg'
         self._config_path = None
         self.parser = None
         self.opts = None
@@ -42,16 +43,10 @@ class Config(object):
         """Get options from command line"""
         # note: will need a way for plugins to add arguments dynamically
         parser = argparse.ArgumentParser()
+        info_group = parser.add_argument_group("Info")
+        config_group = parser.add_argument_group("Config")
+
         parser.add_argument('local', nargs='*')
-        parser.add_argument('--config', help="specify config file")
-        parser.add_argument('--print-config', action='store_true',
-                help="display config after parsing config file and command line.")
-        parser.add_argument('--picasa-user')
-        parser.add_argument('--picasa-password')
-        parser.add_argument('--picasa-title',
-                help="Name of album on Picassa (if lookup needed)")
-        parser.add_argument('--picasa-id',
-                help="ID of album on Picassa (overrides picasa-title)")
         parser.add_argument('-l', '--list', choices=SERVICE,
                 help="List all albums on a specified service, if possible")
         parser.add_argument('-t', '--sync-to', choices=SERVICE)
@@ -67,7 +62,18 @@ class Config(object):
                 help="Do not upload/write files or update cache info")
         parser.add_argument('--interactive', action='store_true', default=False,
                 help="Prompt before taking some actions")
-        parser.add_argument('--verbose', action='store_true', default=False,
+
+        config_group.add_argument('--config', help="specify config file")
+        config_group.add_argument('--picasa-user')
+        config_group.add_argument('--picasa-password')
+        config_group.add_argument('--picasa-title',
+                help="Name of album on Picassa (if lookup needed)")
+        config_group.add_argument('--picasa-id',
+                help="ID of album on Picassa (overrides picasa-title)")
+
+        info_group.add_argument('--print-config', action='store_true',
+                help="display config after parsing config file and command line.")
+        info_group.add_argument('-v', '--verbose', action='store_true', default=False,
                 help="Display extra information when available")
 
         opts = parser.parse_args()
@@ -132,7 +138,9 @@ class Config(object):
         """Pretty Print the contents of the config object, for debugging"""
         import pprint
         print '### Config file: %r' % self._config_path
-        pprint.pprint(self.data)
+        out = pprint.pformat(self.data)
+        out = re.sub(r"'password': '[^']*'", "'password': *hidden*", out)
+        print out
         print '### Command line options:'
         pprint.pprint(self.opts)
         print '### Command line arguments:'
