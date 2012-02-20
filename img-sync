@@ -17,17 +17,37 @@ if c.opts.list:
 
 # we have one or more local paths, what will we do with them?
 elif c.opts.local:
-    for local_album in c.local:
+    for local_album in c.opts.local:
 
         # load cache info if possible
         regcache, cache = registry.AlbumRegistry().new('local', local_album)
         if cache.exists():
-            cache.load()
+            regcache.load()
+            if c.opts.verbose:
+                print "Cached Album Info"
+                print "-----------------"
+                pprint.pprint(regcache.dumpDict())
+                print
+
 
         if c.opts.diff_with:
 
-            pass
+            if c.opts.diff_with == 'local':
+                albumid = local_album
+            else:
+                albumid = getattr(c.opts, c.opts.diff_with + '_id')
 
+            registry, album = registry.AlbumRegistry().new(c.opts.diff_with, albumid)
+
+            album.scan()
+
+            if c.opts.verbose:
+                print "Scanned Album Info"
+                print "------------------"
+                pprint.pprint(registry.dumpDict())
+                print
+
+            diff = album.diff(cache)
 
 
 

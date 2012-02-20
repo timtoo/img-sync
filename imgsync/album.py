@@ -1,3 +1,4 @@
+import datetime
 
 class Album(object):
     """Album adaptor base class. Create an subclass of this, as well as the Image class
@@ -40,22 +41,76 @@ class Album(object):
                 return i
         return None
 
-    def diffAlbum(self, album):
-        """Return dictionary of differences.
+    def dumpDict(self):
+        """Return album data as a dictionary"""
+        album = {
+                'id': self.id,
+                'title': self.title,
+                'description': self.description,
+                'date': self.date,
+                'url': self.url,
+                'timestamp': datetime.datetime.now(),
+                'images': []
+            }
+
+        for i in self.images:
+            album['images'].append(i.dumpDict())
+
+        return album
+
+    def locate(self, album, image):
+        pass
+
+
+    def diff(self, album):
+        """Return dictionary of differences of the given album compared
+                to the current album.
 
             the "images" key will contain a dictionary
             with the keys:
 
-                - different (contining list of
-                    image objects from this album with differences),
-                - same (containing images which match up),
-                - new (containing images not found in this album),
-                - unknown (images in this album which are not
-                    in the source album)
+                - changed (list of image objects from
+                        this album with differences),
+                - same (list of images which match up),
+                - new (list of images not found in this album),
+                - unique (list of images in this album which are not
+                        in the provided album)
 
         """
+        this = self.dumpDict()
+        that = album.dumpDict()
 
-    def createAlbum(self, album):
+        diff = {
+                'same': [],
+                'new': [],
+                'unique': [],
+                'changed': [],
+                }
+
+        # look for differences in album attributes
+        for k in ('title', 'description', 'date'):
+            if getattr(self, k) != getattr(album, k):
+                diff[k] = getattr(album, k)
+
+        thatDict = dict([(x.id, x) for x in album.images])
+
+        for img in self.images:
+            if thatDict.has_key(img.id):
+                imgdiff = i.diff(thatDict(img.id))
+                if imgdiff:
+                    diff['changed'].append(imgdiff)
+                else:
+                    diff['same'].append(img)
+                del thatDict[img.id]
+            else:
+                diff['unique'].append(img)
+
+        diff['new'] = thatDict.values()
+
+        return diff
+
+
+    def create(self, album):
         """Given an album object create/update album on this service
         """
 

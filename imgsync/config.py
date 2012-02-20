@@ -40,6 +40,7 @@ class Config(object):
 
     def config_from_cli(self):
         """Get options from command line"""
+        # note: will need a way for plugins to add arguments dynamically
         parser = argparse.ArgumentParser()
         parser.add_argument('local', nargs='*')
         parser.add_argument('--config', help="specify config file")
