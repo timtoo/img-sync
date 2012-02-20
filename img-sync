@@ -8,6 +8,7 @@ c = config.Config()
 
 # print config
 if c.opts.print_config:
+    print "Current configuration and arguments:"
     c.pprint()
 
 # print album list if possible
