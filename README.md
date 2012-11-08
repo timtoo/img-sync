@@ -3,11 +3,21 @@ IMG-SYNC
 
 Synchronize image files between a local file system and remote services.
 
-- maintain as much metadata as possible when syncronizing (tags, geolocation, etc)
+- maintain as much metadata as possible when syncronizing/uploading (tags, geolocation, etc)
 - remember what images have been syncronized to what remote site
 - ability to check for/list changed local files since last sync
 - update only changed photos (sync!), either locally or remotely
 - update only metadata when syncing, if possible, where only metadata has changed
+- recursively upload/sync multiple albums with one command
+- support multiple remote services
+
+Status
+------
+Pre-Alpha. Nothing is working. Current focus is as follows:
+
+- target picasaweb/google+ as remote service
+- recursive uploader
+- detect changes in local files
 
 
 Command-line tool
@@ -49,7 +59,7 @@ Design
 ------
 
 - configuration file `config/img-sync.cfg` (relative to HOME directory)
-- *album database* is stored in a special file in each folder (`.img-sync-album.db`)
+- *album database* is stored in a special file in each folder (`.img-sync.db`)
     - database is plain text for easy viewing/editing if necessary
     - separate database per album to make moving file system folders easy
     - database contains information about album sync state

@@ -38,7 +38,7 @@ class Storage(object):
 class LocalFileStorage(Storage):
     """Use ConfigParser to create config file to store in local directory"""
     CONFIG_VERSION = "1.0"
-    FILENAME = '.img-sync-album.db'
+    FILENAME = '.img-sync.db'
 
     @property
     def filename(self):
