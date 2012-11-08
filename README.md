@@ -13,6 +13,7 @@ Synchronize image files between a local file system and remote services.
 
 Status
 ------
+
 Pre-Alpha. Nothing is working. Current focus is as follows:
 
 - target picasaweb/google+ as remote service
